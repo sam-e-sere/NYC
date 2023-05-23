@@ -24,13 +24,16 @@ def extract_weather():
         weather.at[index, 'TIME'] = time
 
     # rimuovi la colonna "time" originale
-    weather.drop('time', axis=1, inplace=True)
+    weather = weather.drop('time', axis=1)
 
     # riordina le colonne in base all'ordine desiderato
     weather = weather.reindex(columns=['Y', 'M', 'D', 'TIME'] + list(weather.columns[:-4]))
 
     # seleziona solo le righe con l'anno 2020 
     weather_2020 = weather.loc[weather['Y'] == '2020']
+
+    # rimuovi le tre colonne che riguardano il cloudcover -> è utile solo cloudcover_low
+    weather_2020 = weather_2020.drop(['cloudcover (%)','cloudcover_mid (%)','cloudcover_high (%)'], axis=1)
 
     # visualizza il dataframe risultante
     weather_2020.to_csv("data/New NYC weather.csv", index=False, mode='w')
