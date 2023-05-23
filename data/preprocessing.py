@@ -29,8 +29,11 @@ def extract_weather():
     # riordina le colonne in base all'ordine desiderato
     weather = weather.reindex(columns=['Y', 'M', 'D', 'TIME'] + list(weather.columns[:-4]))
 
+    # seleziona solo le righe con l'anno 2020 
+    weather_2020 = weather.loc[weather['Y'] == '2020']
+
     # visualizza il dataframe risultante
-    weather.to_csv("data/New NYC weather.csv", index=False, mode='w')
+    weather_2020.to_csv("data/New NYC weather.csv", index=False, mode='w')
 
 
 
