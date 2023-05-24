@@ -78,10 +78,23 @@ def extract_accidents():
     accidents.to_csv("data/New NYC Accidents 2020.csv", index=False, mode='w')
 
 
+#Estrazione delle informazioni necessarie del file 'NYC Accidents'
+def extract_traffic():
+    # Caricamento del dataset
+    traffic = pd.read_csv("data/NYC Traffic Volume.csv")
+
+    
+    # rimuovi le colonne non necessarie
+    # accidents = accidents.drop(['ZIP CODE','LOCATION', 'NUMBER OF PEDESTRIANS INJURED','NUMBER OF PEDESTRIANS KILLED','NUMBER OF CYCLIST INJURED','NUMBER OF CYCLIST KILLED','NUMBER OF MOTORIST INJURED','NUMBER OF MOTORIST KILLED','CONTRIBUTING FACTOR VEHICLE 1','CONTRIBUTING FACTOR VEHICLE 2','CONTRIBUTING FACTOR VEHICLE 3','CONTRIBUTING FACTOR VEHICLE 4','CONTRIBUTING FACTOR VEHICLE 5','COLLISION_ID','VEHICLE TYPE CODE 1','VEHICLE TYPE CODE 2','VEHICLE TYPE CODE 3','VEHICLE TYPE CODE 4','VEHICLE TYPE CODE 5'], axis=1)
+
+    # visualizza il dataframe risultante
+    traffic.to_csv("data/New NYC Traffic Volume.csv", index=False, mode='w')
+
+
 
 
 
 def main():
-   extract_accidents()
+    extract_traffic()
 
 main()
