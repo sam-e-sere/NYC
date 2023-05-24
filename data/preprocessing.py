@@ -67,12 +67,12 @@ def extract_accidents():
     # riordina le colonne in base all'ordine desiderato
     accidents = accidents.reindex(columns=['Y', 'M', 'D'] + list(accidents.columns[:-3]))
 
-
-    # rimuovi le tre colonne che riguardano il cloudcover -> è utile solo cloudcover_low
-    #weather_2020 = weather_2020.drop(['cloudcover (%)','cloudcover_mid (%)','cloudcover_high (%)'], axis=1)
-
     # rimuovi gli ultimi tre caratteri (i secondi) dalla colonna 'time'
     accidents['CRASH TIME'] = accidents['CRASH TIME'].str.slice(stop=-3)
+
+    
+    # rimuovi le colonne non necessarie
+    accidents = accidents.drop(['LOCATION', 'NUMBER OF PEDESTRIANS INJURED','NUMBER OF PEDESTRIANS KILLED','NUMBER OF CYCLIST INJURED','NUMBER OF CYCLIST KILLED','NUMBER OF MOTORIST INJURED','NUMBER OF MOTORIST KILLED','CONTRIBUTING FACTOR VEHICLE 1','CONTRIBUTING FACTOR VEHICLE 2','CONTRIBUTING FACTOR VEHICLE 3','CONTRIBUTING FACTOR VEHICLE 4','CONTRIBUTING FACTOR VEHICLE 5','COLLISION_ID','VEHICLE TYPE CODE 1','VEHICLE TYPE CODE 2','VEHICLE TYPE CODE 3','VEHICLE TYPE CODE 4','VEHICLE TYPE CODE 5'], axis=1)
 
     # visualizza il dataframe risultante
     accidents.to_csv("data/New NYC Accidents 2020.csv", index=False, mode='w')
