@@ -113,8 +113,18 @@ def extract_traffic():
     # rimuovi le colonne non necessarie
     traffic = traffic.drop(['WktGeom','X', 'Y','SegmentID','RequestID','fromSt','toSt'], axis=1)
 
+    # Crea una nuova colonna 'TIME' che combina le colonne 'HH' e 'MM'
+    traffic['TIME'] = traffic.apply(lambda row: f"{int(row['HH']):02d}:{int(row['MM']):02d}", axis=1)
+    
+    # rimuovi le colonne "HH" e "MM"
+    traffic = traffic.drop(['HH', 'MM'], axis=1)
+
     #rinomina delle colonne del dataset
     traffic = traffic.rename(columns={'Boro':'BOROUGH', 'Yr':'Y','Vol':'VOL','street':'STREET NAME','Direction':'DIRECTION'})
+    
+    # riordina le colonne in base all'ordine desiderato
+    traffic = traffic.reindex(columns=['BOROUGH','Y','M','D', 'TIME', 'VOL','STREET NAME','DIRECTION', 'LATITUDE', 'LONGITUDE'])
+
 
     # visualizza il dataframe risultante
     traffic.to_csv("data/New NYC Traffic Volume.csv", index=False, mode='w')
@@ -124,6 +134,6 @@ def extract_traffic():
 
 
 def main():
-    extract_accidents()
+    extract_traffic()
 
 main()
