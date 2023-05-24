@@ -1,4 +1,3 @@
-import datetime
 import pandas as pd
 from shapely.wkt import loads
 import pyproj
@@ -105,12 +104,11 @@ def extract_traffic():
     lon, lat = transformer.transform(traffic['X'], traffic['Y'])
 
     # aggiungi le colonne di latitudine e longitudine al dataset
-    traffic['LONGITUDE'] = lon
     traffic['LATITUDE'] = lat
+    traffic['LONGITUDE'] = lon
 
     # rimuovi le colonne non necessarie
-    # accidents = accidents.drop(['ZIP CODE','LOCATION', 'NUMBER OF PEDESTRIANS INJURED','NUMBER OF PEDESTRIANS KILLED','NUMBER OF CYCLIST INJURED','NUMBER OF CYCLIST KILLED','NUMBER OF MOTORIST INJURED','NUMBER OF MOTORIST KILLED','CONTRIBUTING FACTOR VEHICLE 1','CONTRIBUTING FACTOR VEHICLE 2','CONTRIBUTING FACTOR VEHICLE 3','CONTRIBUTING FACTOR VEHICLE 4','CONTRIBUTING FACTOR VEHICLE 5','COLLISION_ID','VEHICLE TYPE CODE 1','VEHICLE TYPE CODE 2','VEHICLE TYPE CODE 3','VEHICLE TYPE CODE 4','VEHICLE TYPE CODE 5'], axis=1)
-
+    traffic = traffic.drop(['WktGeom','X', 'Y','SegmentID','RequestID','fromSt','toSt'], axis=1)
     # visualizza il dataframe risultante
     traffic.to_csv("data/New NYC Traffic Volume.csv", index=False, mode='w')
 
