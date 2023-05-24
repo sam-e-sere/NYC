@@ -75,6 +75,9 @@ def extract_accidents():
     # rimuovi le colonne non necessarie
     accidents = accidents.drop(['ZIP CODE','LOCATION', 'NUMBER OF PEDESTRIANS INJURED','NUMBER OF PEDESTRIANS KILLED','NUMBER OF CYCLIST INJURED','NUMBER OF CYCLIST KILLED','NUMBER OF MOTORIST INJURED','NUMBER OF MOTORIST KILLED','CONTRIBUTING FACTOR VEHICLE 1','CONTRIBUTING FACTOR VEHICLE 2','CONTRIBUTING FACTOR VEHICLE 3','CONTRIBUTING FACTOR VEHICLE 4','CONTRIBUTING FACTOR VEHICLE 5','COLLISION_ID','VEHICLE TYPE CODE 1','VEHICLE TYPE CODE 2','VEHICLE TYPE CODE 3','VEHICLE TYPE CODE 4','VEHICLE TYPE CODE 5'], axis=1)
 
+    #rinomina una colonna del dataset
+    accidents = accidents.rename(columns={'CRASH TIME':'TIME'})
+    
     # visualizza il dataframe risultante
     accidents.to_csv("data/New NYC Accidents 2020.csv", index=False, mode='w')
 
@@ -109,6 +112,10 @@ def extract_traffic():
 
     # rimuovi le colonne non necessarie
     traffic = traffic.drop(['WktGeom','X', 'Y','SegmentID','RequestID','fromSt','toSt'], axis=1)
+
+    #rinomina delle colonne del dataset
+    traffic = traffic.rename(columns={'Boro':'BOROUGH', 'Yr':'Y','Vol':'VOL','street':'STREET NAME','Direction':'DIRECTION'})
+
     # visualizza il dataframe risultante
     traffic.to_csv("data/New NYC Traffic Volume.csv", index=False, mode='w')
 
@@ -117,6 +124,6 @@ def extract_traffic():
 
 
 def main():
-    extract_traffic()
+    extract_accidents()
 
 main()
