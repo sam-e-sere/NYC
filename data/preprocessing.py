@@ -1,5 +1,7 @@
 import datetime
 import pandas as pd
+from shapely.wkt import loads
+import pyproj
 
 #Estrazione delle informazioni necessarie del file 'NYC weather'
 def extract_weather():
@@ -81,9 +83,31 @@ def extract_accidents():
 #Estrazione delle informazioni necessarie del file 'NYC Accidents'
 def extract_traffic():
     # Caricamento del dataset
-    traffic = pd.read_csv("data/NYC Traffic Volume.csv")
+    traffic = pd.read_csv("data/NYC Traffic Volume Counts.csv")
 
     
+    # estrai le coordinate x e y dalla colonna WktGeom e crea una serie geografica
+    geometry = traffic['WktGeom'].apply(lambda x: loads(x))
+    geo_series = pd.Series(geometry)
+
+    # converte le coordinate geografiche in latitudine e longitudine
+    traffic['X'] = geo_series.apply(lambda x: x.x)
+    traffic['Y'] = geo_series.apply(lambda x: x.y)
+
+    
+    # imposta la proiezione cartografica utlizzata nel dataset
+    crs = 'EPSG:2263'  #proiezione cartografica UTM
+
+    # crea un oggetto Transformer per la conversione delle coordinate
+    transformer = pyproj.Transformer.from_crs(crs, 'EPSG:4326', always_xy=True)
+
+    # converte le coordinate in latitudine e longitudine
+    lon, lat = transformer.transform(traffic['X'], traffic['Y'])
+
+    # aggiungi le colonne di latitudine e longitudine al dataset
+    traffic['LONGITUDE'] = lon
+    traffic['LATITUDE'] = lat
+
     # rimuovi le colonne non necessarie
     # accidents = accidents.drop(['ZIP CODE','LOCATION', 'NUMBER OF PEDESTRIANS INJURED','NUMBER OF PEDESTRIANS KILLED','NUMBER OF CYCLIST INJURED','NUMBER OF CYCLIST KILLED','NUMBER OF MOTORIST INJURED','NUMBER OF MOTORIST KILLED','CONTRIBUTING FACTOR VEHICLE 1','CONTRIBUTING FACTOR VEHICLE 2','CONTRIBUTING FACTOR VEHICLE 3','CONTRIBUTING FACTOR VEHICLE 4','CONTRIBUTING FACTOR VEHICLE 5','COLLISION_ID','VEHICLE TYPE CODE 1','VEHICLE TYPE CODE 2','VEHICLE TYPE CODE 3','VEHICLE TYPE CODE 4','VEHICLE TYPE CODE 5'], axis=1)
 
