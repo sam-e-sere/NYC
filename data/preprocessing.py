@@ -71,11 +71,8 @@ def extract_accidents():
     # rimuovi le tre colonne che riguardano il cloudcover -> è utile solo cloudcover_low
     #weather_2020 = weather_2020.drop(['cloudcover (%)','cloudcover_mid (%)','cloudcover_high (%)'], axis=1)
 
-    # converte la colonna del tempo in formato datetime
-    accidents['CRASH TIME'] = pd.to_datetime(accidents['CRASH TIME'], format='%H:%M:%S')
-
-    # formatta la colonna del tempo nel nuovo formato
-    accidents['CRASH TIME'] = accidents['CRASH TIME'].apply(lambda x: datetime.strftime(x, '%H:%M'))
+    # rimuovi gli ultimi tre caratteri (i secondi) dalla colonna 'time'
+    accidents['CRASH TIME'] = accidents['CRASH TIME'].str.slice(stop=-3)
 
     # visualizza il dataframe risultante
     accidents.to_csv("data/New NYC Accidents 2020.csv", index=False, mode='w')
