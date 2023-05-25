@@ -166,7 +166,14 @@ def union_dataset():
     traffico = pd.read_csv("data/New NYC Traffic Volume.csv")
     meteo = pd.read_csv("data/New NYC weather.csv")
 
+    incidenti['MM'] = incidenti['MM'].astype(int)
+
+    trasformazione = lambda x: '00' if x<8 else ('15' if x<24 else ('30' if x<38 else '45'))
+    incidenti['MM'] = incidenti['MM'].apply(trasformazione)
+
+
     incidente_meteo = pd.merge(incidenti, meteo, on=['Y','M','D','HH'], how='inner')
+
 
     # visualizza il dataframe risultante
     incidente_meteo.to_csv("data/merge.csv", index=False, mode='w')
