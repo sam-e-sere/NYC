@@ -117,7 +117,6 @@ def extract_traffic():
     # Caricamento del dataset
     traffic = pd.read_csv("data/NYC Traffic Volume Counts.csv")
 
-    
     # estrai le coordinate x e y dalla colonna WktGeom e crea una serie geografica
     geometry = traffic['WktGeom'].apply(lambda x: loads(x))
     geo_series = pd.Series(geometry)
@@ -148,6 +147,9 @@ def extract_traffic():
     
     # riordina le colonne in base all'ordine desiderato
     traffic = traffic.reindex(columns=['BOROUGH','Y','M','D', 'HH', 'MM', 'VOL','STREET NAME','DIRECTION', 'LATITUDE', 'LONGITUDE'])
+
+    # Trasforma i valori della colonna in maiuscolo
+    traffic['BOROUGH'] = traffic['BOROUGH'].str.upper()
 
 
     # visualizza il dataframe risultante
@@ -187,6 +189,6 @@ def traffico_incidenti():
 
 
 def main():
-    traffico_incidenti()
+    extract_traffic()
 
 main()
