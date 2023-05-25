@@ -28,14 +28,29 @@ def extract_weather():
     # rimuovi la colonna "time" originale
     weather = weather.drop('time', axis=1)
 
+    # crea le nuove colonne vuote
+    weather['HH'] = ''
+
+    # itera su ogni riga del dataframe e separa il tempo
+    for index, row in weather.iterrows():
+        hour, minutes = row['TIME'].split(':')
+        
+        # aggiorna le nuove colonne con i valori corretti
+        weather.at[index, 'HH'] = hour
+
+    # rimuovi la colonna "time" originale
+    weather = weather.drop('TIME', axis=1)
+
     # riordina le colonne in base all'ordine desiderato
-    weather = weather.reindex(columns=['Y', 'M', 'D', 'TIME'] + list(weather.columns[:-4]))
+    weather = weather.reindex(columns=['Y', 'M', 'D', 'HH'] + list(weather.columns[:-4]))
 
     # seleziona solo le righe con l'anno 2020 
     weather_2020 = weather.loc[weather['Y'] == '2020']
 
     # rimuovi le tre colonne che riguardano il cloudcover -> è utile solo cloudcover_low
     weather_2020 = weather_2020.drop(['cloudcover (%)','cloudcover_mid (%)','cloudcover_high (%)'], axis=1)
+
+
 
     # visualizza il dataframe risultante
     weather_2020.to_csv("data/New NYC weather.csv", index=False, mode='w')
@@ -65,18 +80,33 @@ def extract_accidents():
     # rimuovi la colonna "time" originale
     accidents = accidents.drop('CRASH DATE', axis=1)
 
-    # riordina le colonne in base all'ordine desiderato
-    accidents = accidents.reindex(columns=['Y', 'M', 'D'] + list(accidents.columns[:-3]))
-
     # rimuovi gli ultimi tre caratteri (i secondi) dalla colonna 'time'
     accidents['CRASH TIME'] = accidents['CRASH TIME'].str.slice(stop=-3)
 
+    #rinomina una colonna del dataset
+    accidents = accidents.rename(columns={'CRASH TIME':'TIME'})
+
+    # crea le nuove colonne vuote
+    accidents['HH'] = ''
+    accidents['MM'] = ''
+
+    # itera su ogni riga del dataframe e separa la data
+    for index, row in accidents.iterrows():
+        hour, minutes = row['TIME'].split(':')
+        
+        # aggiorna le nuove colonne con i valori corretti
+        accidents.at[index, 'HH'] = hour
+        accidents.at[index, 'MM'] = minutes
+
+    # rimuovi la colonna "time" originale
+    accidents = accidents.drop('TIME', axis=1)
+
+    # riordina le colonne in base all'ordine desiderato
+    accidents = accidents.reindex(columns=['Y', 'M', 'D','HH','MM'] + list(accidents.columns[:-5]))
     
     # rimuovi le colonne non necessarie
     accidents = accidents.drop(['ZIP CODE','LOCATION', 'NUMBER OF PEDESTRIANS INJURED','NUMBER OF PEDESTRIANS KILLED','NUMBER OF CYCLIST INJURED','NUMBER OF CYCLIST KILLED','NUMBER OF MOTORIST INJURED','NUMBER OF MOTORIST KILLED','CONTRIBUTING FACTOR VEHICLE 1','CONTRIBUTING FACTOR VEHICLE 2','CONTRIBUTING FACTOR VEHICLE 3','CONTRIBUTING FACTOR VEHICLE 4','CONTRIBUTING FACTOR VEHICLE 5','COLLISION_ID','VEHICLE TYPE CODE 1','VEHICLE TYPE CODE 2','VEHICLE TYPE CODE 3','VEHICLE TYPE CODE 4','VEHICLE TYPE CODE 5'], axis=1)
 
-    #rinomina una colonna del dataset
-    accidents = accidents.rename(columns={'CRASH TIME':'TIME'})
     
     # visualizza il dataframe risultante
     accidents.to_csv("data/New NYC Accidents 2020.csv", index=False, mode='w')
@@ -130,10 +160,19 @@ def extract_traffic():
     traffic.to_csv("data/New NYC Traffic Volume.csv", index=False, mode='w')
 
 
+def union_dataset():
 
+    incidenti = pd.read_csv("data/New NYC Accidents 2020.csv")
+    traffico = pd.read_csv("data/New NYC Traffic Volume.csv")
+    meteo = pd.read_csv("data/New NYC weather.csv")
+
+    incidente_meteo = pd.merge(incidenti, meteo, on=['Y','M','D','HH'], how='inner')
+
+    # visualizza il dataframe risultante
+    incidente_meteo.to_csv("data/merge.csv", index=False, mode='w')
 
 
 def main():
-    extract_traffic()
+    union_dataset()
 
 main()
