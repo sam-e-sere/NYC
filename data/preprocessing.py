@@ -143,17 +143,11 @@ def extract_traffic():
     # rimuovi le colonne non necessarie
     traffic = traffic.drop(['WktGeom','X', 'Y','SegmentID','RequestID','fromSt','toSt'], axis=1)
 
-    # Crea una nuova colonna 'TIME' che combina le colonne 'HH' e 'MM'
-    traffic['TIME'] = traffic.apply(lambda row: f"{int(row['HH']):02d}:{int(row['MM']):02d}", axis=1)
-    
-    # rimuovi le colonne "HH" e "MM"
-    traffic = traffic.drop(['HH', 'MM'], axis=1)
-
     #rinomina delle colonne del dataset
     traffic = traffic.rename(columns={'Boro':'BOROUGH', 'Yr':'Y','Vol':'VOL','street':'STREET NAME','Direction':'DIRECTION'})
     
     # riordina le colonne in base all'ordine desiderato
-    traffic = traffic.reindex(columns=['BOROUGH','Y','M','D', 'TIME', 'VOL','STREET NAME','DIRECTION', 'LATITUDE', 'LONGITUDE'])
+    traffic = traffic.reindex(columns=['BOROUGH','Y','M','D', 'HH', 'MM', 'VOL','STREET NAME','DIRECTION', 'LATITUDE', 'LONGITUDE'])
 
 
     # visualizza il dataframe risultante
@@ -178,8 +172,21 @@ def union_dataset():
     # visualizza il dataframe risultante
     incidente_meteo.to_csv("data/merge.csv", index=False, mode='w')
 
+def traffico_incidenti():
+
+    incidenti_meteo = pd.read_csv("data/merge.csv")
+    traffico = pd.read_csv("data/traffico2.csv")
+
+    #rinomina delle colonne del dataset
+    incidenti_meteo = incidenti_meteo.rename(columns={'ON STREET NAME':'STREET NAME'})
+
+    incidente_meteo = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'STREET NAME'], how='inner')
+
+    # visualizza il dataframe risultante
+    incidente_meteo.to_csv("data/merge2.csv", index=False, mode='w')
+
 
 def main():
-    union_dataset()
+    traffico_incidenti()
 
 main()
