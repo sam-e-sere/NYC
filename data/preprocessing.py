@@ -61,7 +61,7 @@ def extract_weather():
 #Estrazione delle informazioni necessarie del file 'NYC Accidents'
 def extract_accidents():
     # Caricamento del dataset
-    accidents = pd.read_csv("data/NYC Accidents 2020.csv")
+    accidents = pd.read_csv("data/NYC Accidents.csv")
     # crea le nuove colonne vuote
     accidents['Y'] = ''
     accidents['M'] = ''
@@ -69,7 +69,7 @@ def extract_accidents():
 
     # itera su ogni riga del dataframe e separa la data
     for index, row in accidents.iterrows():
-        year, month, day = row['CRASH DATE'].split('-')
+        year, month, day = row['CRASH DATE'].split('/')
         
         # aggiorna le nuove colonne con i valori corretti
         accidents.at[index, 'Y'] = year
@@ -80,26 +80,20 @@ def extract_accidents():
     # rimuovi la colonna "time" originale
     accidents = accidents.drop('CRASH DATE', axis=1)
 
-    # rimuovi gli ultimi tre caratteri (i secondi) dalla colonna 'time'
-    accidents['CRASH TIME'] = accidents['CRASH TIME'].str.slice(stop=-3)
-
-    #rinomina una colonna del dataset
-    accidents = accidents.rename(columns={'CRASH TIME':'TIME'})
-
     # crea le nuove colonne vuote
     accidents['HH'] = ''
     accidents['MM'] = ''
 
     # itera su ogni riga del dataframe e separa la data
     for index, row in accidents.iterrows():
-        hour, minutes = row['TIME'].split(':')
+        hour, minutes = row['CRASH TIME'].split(':')
         
         # aggiorna le nuove colonne con i valori corretti
         accidents.at[index, 'HH'] = hour
         accidents.at[index, 'MM'] = minutes
 
     # rimuovi la colonna "time" originale
-    accidents = accidents.drop('TIME', axis=1)
+    accidents = accidents.drop('CRASH TIME', axis=1)
 
     # riordina le colonne in base all'ordine desiderato
     accidents = accidents.reindex(columns=['Y', 'M', 'D','HH','MM'] + list(accidents.columns[:-5]))
@@ -109,7 +103,7 @@ def extract_accidents():
 
     
     # visualizza il dataframe risultante
-    accidents.to_csv("data/New NYC Accidents 2020.csv", index=False, mode='w')
+    accidents.to_csv("data/New NYC Accidents.csv", index=False, mode='w')
 
 
 #Estrazione delle informazioni necessarie del file 'NYC Accidents'
@@ -189,6 +183,6 @@ def traffico_incidenti():
 
 
 def main():
-    extract_traffic()
+    extract_accidents()
 
 main()
