@@ -69,7 +69,7 @@ def extract_accidents():
 
     # itera su ogni riga del dataframe e separa la data
     for index, row in accidents.iterrows():
-        year, month, day = row['CRASH DATE'].split('/')
+        month, day, year = row['CRASH DATE'].split('/')
         
         # aggiorna le nuove colonne con i valori corretti
         accidents.at[index, 'Y'] = year
@@ -155,7 +155,6 @@ def extract_traffic():
 def union_dataset():
 
     incidenti = pd.read_csv("data/New NYC Accidents.csv")
-    traffico = pd.read_csv("data/New NYC Traffic.csv")
     meteo = pd.read_csv("data/New NYC weather.csv")
 
     incidenti['MM'] = incidenti['MM'].astype(int)
@@ -173,18 +172,19 @@ def union_dataset():
 def traffico_incidenti():
 
     incidenti_meteo = pd.read_csv("data/merge.csv")
-    #traffico = pd.read_csv("data/new NYC Traffic.csv")
+    traffico = pd.read_csv("data/new NYC Traffic.csv")
 
     #rinomina delle colonne del dataset
     incidenti_meteo = incidenti_meteo.rename(columns={'ON STREET NAME':'STREET NAME'})
 
-    incidente_meteo = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'STREET NAME'], how='inner')
+    incidente_meteo = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'HH', 'MM', 'STREET NAME'], how='inner')
 
     # visualizza il dataframe risultante
     incidente_meteo.to_csv("data/merge2.csv", index=False, mode='w')
 
 
 def main():
+    extract_accidents()
     union_dataset()
     traffico_incidenti()
 
