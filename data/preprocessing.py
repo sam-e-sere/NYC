@@ -177,10 +177,37 @@ def traffico_incidenti():
     #rinomina delle colonne del dataset
     incidenti_meteo = incidenti_meteo.rename(columns={'ON STREET NAME':'STREET NAME'})
 
-    incidente_meteo = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'HH', 'MM', 'STREET NAME'], how='inner')
+    #incidenti_meteo = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'HH', 'MM', 'STREET NAME'], how='inner')
+
+
+    # Effettua il merge dei due dataset utilizzando le colonne comuni 'Y', 'M', 'D', 'HH', 'MM' e 'STREET NAME'
+    incidente_meteo = pd.merge(incidenti_meteo, traffico, on=['Y', 'M', 'D', 'HH', 'MM', 'STREET NAME', 'CROSS STREET NAME','OFF STREET NAME'], how='left')
+
+
+    """
+
+    # Esegui il merge utilizzando le diverse colonne a seconda della presenza di valori mancanti
+    merged = incidenti_meteo.merge(traffico, on=merge_order, how="outer")
+    merged["STREET NAME_y"].fillna(merged["STREET NAME_x"], inplace=True)
+    merged.drop("STREET NAME_x", axis=1, inplace=True)
+    merged.rename(columns={"STREET NAME_y": "STREET NAME"}, inplace=True)
+    
+    
+    # Effettua il merge dei due dataset utilizzando le colonne comuni 'Y', 'M', 'D', 'HH', 'MM' e 'STREET NAME'
+    incidente_meteo = pd.merge(incidenti_meteo, traffico, on=['Y', 'M', 'D', 'HH', 'MM', 'STREET NAME'], how='left')
+
+    # Sostituisci eventuali valori mancanti nella colonna 'STREET NAME' con i valori della colonna 'CROSS STREET NAME'
+    incidente_meteo['STREET NAME'] = incidente_meteo['STREET NAME'].fillna(incidente_meteo['CROSS STREET NAME'])
+
+    # Sostituisci eventuali valori mancanti nella colonna 'STREET NAME' con i valori della colonna 'OFF STREET NAME'
+    incidente_meteo['STREET NAME'] = incidente_meteo['STREET NAME'].fillna(incidente_meteo['OFF STREET NAME'])
+
+    # Rimuovi le colonne 'CROSS STREET NAME' e 'OFF STREET NAME'
+    incidente_meteo = incidente_meteo.drop(['CROSS STREET NAME', 'OFF STREET NAME'], axis=1)
+    """
 
     # visualizza il dataframe risultante
-    incidente_meteo.to_csv("data/merge2.csv", index=False, mode='w')
+    merged.to_csv("data/merge3.csv", index=False, mode='w')
 
 
 def main():
