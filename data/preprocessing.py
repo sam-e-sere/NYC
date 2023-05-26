@@ -101,7 +101,9 @@ def extract_accidents():
     # rimuovi le colonne non necessarie
     accidents = accidents.drop(['ZIP CODE','LOCATION', 'NUMBER OF PEDESTRIANS INJURED','NUMBER OF PEDESTRIANS KILLED','NUMBER OF CYCLIST INJURED','NUMBER OF CYCLIST KILLED','NUMBER OF MOTORIST INJURED','NUMBER OF MOTORIST KILLED','CONTRIBUTING FACTOR VEHICLE 1','CONTRIBUTING FACTOR VEHICLE 2','CONTRIBUTING FACTOR VEHICLE 3','CONTRIBUTING FACTOR VEHICLE 4','CONTRIBUTING FACTOR VEHICLE 5','COLLISION_ID','VEHICLE TYPE CODE 1','VEHICLE TYPE CODE 2','VEHICLE TYPE CODE 3','VEHICLE TYPE CODE 4','VEHICLE TYPE CODE 5'], axis=1)
 
-    
+    accidents = accidents.apply(lambda x: x.str.upper() if x.dtype == "object" else x)
+
+
     # visualizza il dataframe risultante
     accidents.to_csv("data/New NYC Accidents.csv", index=False, mode='w')
 
@@ -109,7 +111,7 @@ def extract_accidents():
 #Estrazione delle informazioni necessarie del file 'NYC Accidents'
 def extract_traffic():
     # Caricamento del dataset
-    traffic = pd.read_csv("data/NYC Traffic Volume Counts.csv")
+    traffic = pd.read_csv("data/NYC Traffic.csv")
 
     # estrai le coordinate x e y dalla colonna WktGeom e crea una serie geografica
     geometry = traffic['WktGeom'].apply(lambda x: loads(x))
@@ -134,7 +136,7 @@ def extract_traffic():
     traffic['LONGITUDE'] = lon
 
     # rimuovi le colonne non necessarie
-    traffic = traffic.drop(['WktGeom','X', 'Y','SegmentID','RequestID','fromSt','toSt'], axis=1)
+    traffic = traffic.drop(['WktGeom','X', 'Y'], axis=1)
 
     #rinomina delle colonne del dataset
     traffic = traffic.rename(columns={'Boro':'BOROUGH', 'Yr':'Y','Vol':'VOL','street':'STREET NAME','Direction':'DIRECTION'})
@@ -142,18 +144,18 @@ def extract_traffic():
     # riordina le colonne in base all'ordine desiderato
     traffic = traffic.reindex(columns=['BOROUGH','Y','M','D', 'HH', 'MM', 'VOL','STREET NAME','DIRECTION', 'LATITUDE', 'LONGITUDE'])
 
-    # Trasforma i valori della colonna in maiuscolo
-    traffic['BOROUGH'] = traffic['BOROUGH'].str.upper()
+    # Trasforma i valori  in maiuscolo
+    traffic = traffic.apply(lambda x: x.str.upper() if x.dtype == "object" else x)
 
 
     # visualizza il dataframe risultante
-    traffic.to_csv("data/New NYC Traffic Volume.csv", index=False, mode='w')
+    traffic.to_csv("data/New NYC Traffic.csv", index=False, mode='w')
 
 
 def union_dataset():
 
-    incidenti = pd.read_csv("data/New NYC Accidents 2020.csv")
-    traffico = pd.read_csv("data/New NYC Traffic Volume.csv")
+    incidenti = pd.read_csv("data/New NYC Accidents.csv")
+    traffico = pd.read_csv("data/New NYC Traffic.csv")
     meteo = pd.read_csv("data/New NYC weather.csv")
 
     incidenti['MM'] = incidenti['MM'].astype(int)
@@ -164,14 +166,14 @@ def union_dataset():
 
     incidente_meteo = pd.merge(incidenti, meteo, on=['Y','M','D','HH'], how='inner')
 
-
     # visualizza il dataframe risultante
     incidente_meteo.to_csv("data/merge.csv", index=False, mode='w')
+    
 
 def traffico_incidenti():
 
     incidenti_meteo = pd.read_csv("data/merge.csv")
-    traffico = pd.read_csv("data/traffico2.csv")
+    #traffico = pd.read_csv("data/new NYC Traffic.csv")
 
     #rinomina delle colonne del dataset
     incidenti_meteo = incidenti_meteo.rename(columns={'ON STREET NAME':'STREET NAME'})
@@ -183,6 +185,7 @@ def traffico_incidenti():
 
 
 def main():
-    extract_accidents()
+    union_dataset()
+    traffico_incidenti()
 
 main()
