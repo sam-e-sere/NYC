@@ -5,7 +5,7 @@ import pyproj
 #Estrazione delle informazioni necessarie del file 'NYC weather'
 def extract_weather():
     # Caricamento del dataset
-    weather = pd.read_csv("data/NYC weather.csv")
+    weather = pd.read_csv("data/NYC Weather.csv")
     # crea le nuove colonne vuote
     weather['Y'] = ''
     weather['M'] = ''
@@ -53,7 +53,7 @@ def extract_weather():
 
 
     # visualizza il dataframe risultante
-    weather.to_csv("data/New NYC weather.csv", index=False, mode='w')
+    weather.to_csv("data/New NYC Weather.csv", index=False, mode='w')
 
 
 
@@ -61,7 +61,7 @@ def extract_weather():
 #Estrazione delle informazioni necessarie del file 'NYC Accidents'
 def extract_accidents():
     # Caricamento del dataset
-    accidents = pd.read_csv("data/finale_incidenti.csv")
+    accidents = pd.read_csv("data/NYC Accidents.csv")
     # crea le nuove colonne vuote
     accidents['Y'] = ''
     accidents['M'] = ''
@@ -111,7 +111,7 @@ def extract_accidents():
 #Estrazione delle informazioni necessarie del file 'NYC Accidents'
 def extract_traffic():
     # Caricamento del dataset
-    traffic = pd.read_csv("data/finale_traffico.csv")
+    traffic = pd.read_csv("data/NYC Traffic.csv")
 
     """
     # estrai le coordinate x e y dalla colonna WktGeom e crea una serie geografica
@@ -140,11 +140,14 @@ def extract_traffic():
     traffic = traffic.drop(['WktGeom','X', 'Y'], axis=1)
     """
 
+    # crea un nuovo DataFrame con la media dei valori di "Vol" per ogni gruppo di righe duplicate
+    traffic = traffic.groupby(['Boro', 'Yr', 'M', 'D', 'HH', 'MM', 'street'], as_index=False)['Vol'].mean()
+
     #rinomina delle colonne del dataset
-    traffic = traffic.rename(columns={'Boro':'BOROUGH', 'Yr':'Y','Vol':'VOL','street':'STREET NAME','Direction':'DIRECTION'})
+    traffic = traffic.rename(columns={'Boro':'BOROUGH', 'Yr':'Y','Vol':'VOL','street':'STREET NAME'})
     
     # riordina le colonne in base all'ordine desiderato
-    traffic = traffic.reindex(columns=['BOROUGH','Y','M','D', 'HH', 'MM', 'VOL','STREET NAME','DIRECTION'])
+    traffic = traffic.reindex(columns=['BOROUGH','Y','M','D', 'HH', 'MM', 'VOL','STREET NAME'])
 
     # Trasforma i valori  in maiuscolo
     traffic = traffic.apply(lambda x: x.str.upper() if x.dtype == "object" else x)
@@ -157,7 +160,7 @@ def extract_traffic():
 def union_dataset():
 
     incidenti = pd.read_csv("data/New NYC Accidents.csv")
-    meteo = pd.read_csv("data/New NYC weather.csv")
+    meteo = pd.read_csv("data/New NYC Weather.csv")
 
     incidenti['MM'] = incidenti['MM'].astype(int)
 
@@ -168,12 +171,12 @@ def union_dataset():
     incidente_meteo = pd.merge(incidenti, meteo, on=['Y','M','D','HH'], how='inner')
 
     # visualizza il dataframe risultante
-    incidente_meteo.to_csv("data/Incidenti meteo.csv", index=False, mode='w')
+    incidente_meteo.to_csv("data/Accidents Weather.csv", index=False, mode='w')
     
 
 def traffico_incidenti():
 
-    incidenti_meteo = pd.read_csv("data/Incidenti meteo.csv")
+    incidenti_meteo = pd.read_csv("data/Accidents Weather.csv")
     traffico = pd.read_csv("data/New NYC Traffic.csv")
 
     #rinomina delle colonne del dataset
@@ -213,7 +216,7 @@ def traffico_incidenti():
     concatenaz.drop_duplicates(subset=['Y','M','D','HH','MM','STREET NAME', 'CROSS STREET NAME', 'OFF STREET NAME'], keep='first', inplace=True)
 
     # visualizza il dataframe risultante
-    concatenaz.to_csv("data/final_dataset.csv", index=False, mode='w')
+    concatenaz.to_csv("data/Final Dataset.csv", index=False, mode='w')
 
 
 
