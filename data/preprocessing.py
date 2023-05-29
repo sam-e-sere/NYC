@@ -45,15 +45,15 @@ def extract_weather():
     weather = weather.reindex(columns=['Y', 'M', 'D', 'HH'] + list(weather.columns[:-4]))
 
     # seleziona solo le righe con l'anno 2020 
-    weather_2020 = weather.loc[weather['Y'] == '2020']
+    weather = weather.loc[(weather['Y'] == '2020') | (weather['Y'] == '2021')]
 
     # rimuovi le tre colonne che riguardano il cloudcover -> è utile solo cloudcover_low
-    weather_2020 = weather_2020.drop(['cloudcover (%)','cloudcover_mid (%)','cloudcover_high (%)'], axis=1)
+    weather = weather.drop(['cloudcover (%)','cloudcover_mid (%)','cloudcover_high (%)'], axis=1)
 
 
 
     # visualizza il dataframe risultante
-    weather_2020.to_csv("data/New NYC weather.csv", index=False, mode='w')
+    weather.to_csv("data/New NYC weather.csv", index=False, mode='w')
 
 
 
@@ -166,22 +166,21 @@ def union_dataset():
     incidente_meteo = pd.merge(incidenti, meteo, on=['Y','M','D','HH'], how='inner')
 
     # visualizza il dataframe risultante
-    incidente_meteo.to_csv("data/merge.csv", index=False, mode='w')
+    incidente_meteo.to_csv("data/Incidenti meteo.csv", index=False, mode='w')
     
 
 def traffico_incidenti():
 
-    incidenti_meteo = pd.read_csv("data/merge.csv")
-    traffico = pd.read_csv("data/new NYC Traffic.csv")
+    incidenti_meteo = pd.read_csv("data/Incidenti meteo.csv")
+    traffico = pd.read_csv("data/New NYC Traffic.csv")
 
-    """"
     #rinomina delle colonne del dataset
     incidenti_meteo = incidenti_meteo.rename(columns={'ON STREET NAME':'STREET NAME'})
 
-    merged_df = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'HH', 'MM', 'STREET NAME'], how='inner')
+    merged1 = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'HH', 'MM', 'STREET NAME'], how='inner')
 
     # visualizza il dataframe risultante
-    merged_df.to_csv("data/merge3.csv", index=False, mode='w')
+    merged1.to_csv("data/working_dataset/merge_on_street.csv", index=False, mode='w')
 
     #rinomina delle colonne del dataset
     traffico = traffico.rename(columns={'STREET NAME':'CROSS STREET NAME'})
@@ -189,18 +188,35 @@ def traffico_incidenti():
     merged2 = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'HH', 'MM', 'CROSS STREET NAME'], how='inner')
 
     # visualizza il dataframe risultante
-    merged2.to_csv("data/merge4.csv", index=False, mode='w')
-    """
+    merged2.to_csv("data/working_dataset/merge_cross_street.csv", index=False, mode='w')
+
     #rinomina delle colonne del dataset
-    traffico = traffico.rename(columns={'STREET NAME':'OFF STREET NAME'})
+    traffico = traffico.rename(columns={'CROSS STREET NAME':'OFF STREET NAME'})
 
     merged3 = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'HH', 'MM', 'OFF STREET NAME'], how='inner')
 
     # visualizza il dataframe risultante
-    merged3.to_csv("data/merge5.csv", index=False, mode='w')
+    merged3.to_csv("data/working_dataset/merge_off_street.csv", index=False, mode='w')
+
+    # concatena i due DataFrame lungo l'asse delle righe
+    concatenaz = pd.concat([merged1, merged2, merged3], axis=0)
+
+    # identifica le righe duplicate escludendo la colonna TRAFFICO
+    duplicated_rows = concatenaz.duplicated(subset=['Y','M','D','HH','MM','STREET NAME', 'CROSS STREET NAME', 'OFF STREET NAME'], keep='first')
+
+    # crea un DataFrame con le righe duplicate e le rispettive occorrenze di TRAFFICO
+    duplicated_df = concatenaz[duplicated_rows]
+
+    # elimina le righe duplicate, tranne la prima occorrenza
+    concatenaz.drop_duplicates(subset=['Y','M','D','HH','MM','STREET NAME', 'CROSS STREET NAME', 'OFF STREET NAME'], keep='first', inplace=True)
+
+    # visualizza il dataframe risultante
+    concatenaz.to_csv("data/final_dataset.csv", index=False, mode='w')
+
+
 
 def main():
-    extract_accidents()
+    extract_weather()
     union_dataset()
     traffico_incidenti()
 
