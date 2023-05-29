@@ -162,7 +162,7 @@ def extract_traffic():
 
 def union_dataset():
 
-    incidenti = pd.read_csv("data/New NYC Accidents.csv")
+    incidenti = pd.read_csv("data/Complete Accidents.csv")
     meteo = pd.read_csv("data/New NYC Weather.csv")
 
     incidenti['MM'] = incidenti['MM'].astype(int)
