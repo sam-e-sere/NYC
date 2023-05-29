@@ -5,7 +5,7 @@ import pyproj
 #Estrazione delle informazioni necessarie del file 'NYC weather'
 def extract_weather():
     # Caricamento del dataset
-    weather = pd.read_csv("data/NYC Weather.csv")
+    weather = pd.read_csv("data/old dataset/ONYC Weather.csv")
     # crea le nuove colonne vuote
     weather['Y'] = ''
     weather['M'] = ''
@@ -61,7 +61,7 @@ def extract_weather():
 #Estrazione delle informazioni necessarie del file 'NYC Accidents'
 def extract_accidents():
     # Caricamento del dataset
-    accidents = pd.read_csv("data/NYC Accidents.csv")
+    accidents = pd.read_csv("data/old dataset/NYC Accidents.csv")
     # crea le nuove colonne vuote
     accidents['Y'] = ''
     accidents['M'] = ''
@@ -114,7 +114,7 @@ def extract_accidents():
 #Estrazione delle informazioni necessarie del file 'NYC Accidents'
 def extract_traffic():
     # Caricamento del dataset
-    traffic = pd.read_csv("data/NYC Traffic.csv")
+    traffic = pd.read_csv("data/old dataset/NYC Traffic.csv")
 
     """
     # estrai le coordinate x e y dalla colonna WktGeom e crea una serie geografica
