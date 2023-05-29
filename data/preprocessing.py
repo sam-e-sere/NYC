@@ -103,6 +103,9 @@ def extract_accidents():
 
     accidents = accidents.apply(lambda x: x.str.upper() if x.dtype == "object" else x)
 
+    # rimuove le righe con valori mancanti nelle colonne "LATITUDE" e "LONGITUDE"
+    accidents = accidents.dropna(subset=['LATITUDE', 'LONGITUDE'])
+
 
     # visualizza il dataframe risultante
     accidents.to_csv("data/New NYC Accidents.csv", index=False, mode='w')
