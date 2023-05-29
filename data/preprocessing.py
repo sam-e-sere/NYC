@@ -45,7 +45,7 @@ def extract_weather():
     weather = weather.reindex(columns=['Y', 'M', 'D', 'HH'] + list(weather.columns[:-4]))
 
     # seleziona solo le righe con l'anno 2020 
-    weather = weather.loc[(weather['Y'] == '2020') | (weather['Y'] == '2021')]
+    weather = weather.loc[(weather['Y'] == '2019') | (weather['Y'] == '2020')]
 
     # rimuovi le tre colonne che riguardano il cloudcover -> è utile solo cloudcover_low
     weather = weather.drop(['cloudcover (%)','cloudcover_mid (%)','cloudcover_high (%)'], axis=1)
@@ -61,7 +61,7 @@ def extract_weather():
 #Estrazione delle informazioni necessarie del file 'NYC Accidents'
 def extract_accidents():
     # Caricamento del dataset
-    accidents = pd.read_csv("data/NYC Accidents.csv")
+    accidents = pd.read_csv("data/finale_incidenti.csv")
     # crea le nuove colonne vuote
     accidents['Y'] = ''
     accidents['M'] = ''
@@ -111,8 +111,9 @@ def extract_accidents():
 #Estrazione delle informazioni necessarie del file 'NYC Accidents'
 def extract_traffic():
     # Caricamento del dataset
-    traffic = pd.read_csv("data/NYC Traffic.csv")
+    traffic = pd.read_csv("data/finale_traffico.csv")
 
+    """
     # estrai le coordinate x e y dalla colonna WktGeom e crea una serie geografica
     geometry = traffic['WktGeom'].apply(lambda x: loads(x))
     geo_series = pd.Series(geometry)
@@ -137,12 +138,13 @@ def extract_traffic():
 
     # rimuovi le colonne non necessarie
     traffic = traffic.drop(['WktGeom','X', 'Y'], axis=1)
+    """
 
     #rinomina delle colonne del dataset
     traffic = traffic.rename(columns={'Boro':'BOROUGH', 'Yr':'Y','Vol':'VOL','street':'STREET NAME','Direction':'DIRECTION'})
     
     # riordina le colonne in base all'ordine desiderato
-    traffic = traffic.reindex(columns=['BOROUGH','Y','M','D', 'HH', 'MM', 'VOL','STREET NAME','DIRECTION', 'LATITUDE', 'LONGITUDE'])
+    traffic = traffic.reindex(columns=['BOROUGH','Y','M','D', 'HH', 'MM', 'VOL','STREET NAME','DIRECTION'])
 
     # Trasforma i valori  in maiuscolo
     traffic = traffic.apply(lambda x: x.str.upper() if x.dtype == "object" else x)
@@ -217,6 +219,8 @@ def traffico_incidenti():
 
 def main():
     extract_weather()
+    extract_accidents()
+    extract_traffic()
     union_dataset()
     traffico_incidenti()
 
