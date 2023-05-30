@@ -1,11 +1,11 @@
 import pandas as pd
 from shapely.wkt import loads
-import pyproj
+from knn import borough_prediction
 
 #Estrazione delle informazioni necessarie del file 'NYC weather'
 def extract_weather():
     # Caricamento del dataset
-    weather = pd.read_csv("data/old dataset/ONYC Weather.csv")
+    weather = pd.read_csv("data/old dataset/NYC Weather.csv")
     # crea le nuove colonne vuote
     weather['Y'] = ''
     weather['M'] = ''
@@ -185,7 +185,7 @@ def traffico_incidenti():
     #rinomina delle colonne del dataset
     incidenti_meteo = incidenti_meteo.rename(columns={'ON STREET NAME':'STREET NAME'})
 
-    merged1 = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'HH', 'MM', 'STREET NAME'], how='inner')
+    merged1 = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'HH', 'MM', 'BOROUGH','STREET NAME'], how='inner')
 
     # visualizza il dataframe risultante
     merged1.to_csv("data/working_dataset/merge_on_street.csv", index=False, mode='w')
@@ -193,7 +193,7 @@ def traffico_incidenti():
     #rinomina delle colonne del dataset
     traffico = traffico.rename(columns={'STREET NAME':'CROSS STREET NAME'})
 
-    merged2 = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'HH', 'MM', 'CROSS STREET NAME'], how='inner')
+    merged2 = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'HH', 'MM', 'BOROUGH', 'CROSS STREET NAME'], how='inner')
 
     # visualizza il dataframe risultante
     merged2.to_csv("data/working_dataset/merge_cross_street.csv", index=False, mode='w')
@@ -201,7 +201,7 @@ def traffico_incidenti():
     #rinomina delle colonne del dataset
     traffico = traffico.rename(columns={'CROSS STREET NAME':'OFF STREET NAME'})
 
-    merged3 = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'HH', 'MM', 'OFF STREET NAME'], how='inner')
+    merged3 = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'HH', 'MM', 'BOROUGH', 'OFF STREET NAME'], how='inner')
 
     # visualizza il dataframe risultante
     merged3.to_csv("data/working_dataset/merge_off_street.csv", index=False, mode='w')
@@ -210,13 +210,13 @@ def traffico_incidenti():
     concatenaz = pd.concat([merged1, merged2, merged3], axis=0)
 
     # identifica le righe duplicate escludendo la colonna TRAFFICO
-    duplicated_rows = concatenaz.duplicated(subset=['Y','M','D','HH','MM','STREET NAME', 'CROSS STREET NAME', 'OFF STREET NAME'], keep='first')
+    duplicated_rows = concatenaz.duplicated(subset=['Y','M','D','HH','MM', 'BOROUGH','STREET NAME', 'CROSS STREET NAME', 'OFF STREET NAME'], keep='first')
 
     # crea un DataFrame con le righe duplicate e le rispettive occorrenze di TRAFFICO
     duplicated_df = concatenaz[duplicated_rows]
 
     # elimina le righe duplicate, tranne la prima occorrenza
-    concatenaz.drop_duplicates(subset=['Y','M','D','HH','MM','STREET NAME', 'CROSS STREET NAME', 'OFF STREET NAME'], keep='first', inplace=True)
+    concatenaz.drop_duplicates(subset=['Y','M','D','HH','MM', 'BOROUGH','STREET NAME', 'CROSS STREET NAME', 'OFF STREET NAME'], keep='first', inplace=True)
 
     # visualizza il dataframe risultante
     concatenaz.to_csv("data/Final Dataset.csv", index=False, mode='w')
@@ -227,6 +227,7 @@ def main():
     extract_weather()
     extract_accidents()
     extract_traffic()
+    borough_prediction()
     union_dataset()
     traffico_incidenti()
 
