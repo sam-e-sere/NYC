@@ -95,8 +95,11 @@ def extract_accidents():
     # rimuovi la colonna "time" originale
     accidents = accidents.drop('CRASH TIME', axis=1)
 
+    # Aggiungi una colonna ID con valori sequenziali
+    accidents.insert(0, 'ACCIDENT ID', range(1, len(accidents)+1))
+
     # riordina le colonne in base all'ordine desiderato
-    accidents = accidents.reindex(columns=['Y', 'M', 'D','HH','MM'] + list(accidents.columns[:-5]))
+    accidents = accidents.reindex(columns=['ID','Y', 'M', 'D','HH','MM'] + list(accidents.columns[:-5]))
     
     # rimuovi le colonne non necessarie
     accidents = accidents.drop(['ZIP CODE','LOCATION', 'NUMBER OF PEDESTRIANS INJURED','NUMBER OF PEDESTRIANS KILLED','NUMBER OF CYCLIST INJURED','NUMBER OF CYCLIST KILLED','NUMBER OF MOTORIST INJURED','NUMBER OF MOTORIST KILLED','CONTRIBUTING FACTOR VEHICLE 1','CONTRIBUTING FACTOR VEHICLE 2','CONTRIBUTING FACTOR VEHICLE 3','CONTRIBUTING FACTOR VEHICLE 4','CONTRIBUTING FACTOR VEHICLE 5','COLLISION_ID','VEHICLE TYPE CODE 1','VEHICLE TYPE CODE 2','VEHICLE TYPE CODE 3','VEHICLE TYPE CODE 4','VEHICLE TYPE CODE 5'], axis=1)
@@ -105,7 +108,6 @@ def extract_accidents():
 
     # rimuove le righe con valori mancanti nelle colonne "LATITUDE" e "LONGITUDE"
     accidents = accidents.dropna(subset=['LATITUDE', 'LONGITUDE'])
-
 
     # visualizza il dataframe risultante
     accidents.to_csv("data/New NYC Accidents.csv", index=False, mode='w')
@@ -148,9 +150,12 @@ def extract_traffic():
 
     #rinomina delle colonne del dataset
     traffic = traffic.rename(columns={'Boro':'BOROUGH', 'Yr':'Y','Vol':'VOL','street':'STREET NAME'})
+
+    # Aggiungi una colonna ID con valori sequenziali
+    traffic.insert(0, 'TRAFFIC ID', range(1, len(traffic)+1))
     
     # riordina le colonne in base all'ordine desiderato
-    traffic = traffic.reindex(columns=['BOROUGH','Y','M','D', 'HH', 'MM', 'VOL','STREET NAME'])
+    traffic = traffic.reindex(columns=['TRAFFIC ID','BOROUGH','Y','M','D', 'HH', 'MM', 'VOL','STREET NAME'])
 
     # Trasforma i valori  in maiuscolo
     traffic = traffic.apply(lambda x: x.str.upper() if x.dtype == "object" else x)
