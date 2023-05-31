@@ -16,7 +16,7 @@ def load_data_in_kb(accidents: pd.DataFrame, traffic: pd.DataFrame, weather: pd.
     #Inserimento dati per gli Incidenti
     for index, row in accidents.iterrows():
         collision_id = f"accident({row['COLLISION_ID']})"
-        data = f"{row['Y']}-{row['M']}-{row['D']}T{row['HH']}:{row['MM']}:00"
+        data = f"{row['Y']}-{row['M']}-{row['D']} {row['HH']}:{row['MM']}:00"
         info = [f"year({collision_id}, {row['Y']})",
                  f"month({collision_id},{row['M']})",
                  f"day({collision_id},{row['D']})",
@@ -29,14 +29,39 @@ def load_data_in_kb(accidents: pd.DataFrame, traffic: pd.DataFrame, weather: pd.
                  f"cross street name({collision_id},{row['CROSS STREET NAME']})",
                  f"off street name({collision_id},{row['OFF STREET NAME']})",
                  f"num_injured({collision_id},{row['NUMBER OF PERSON INJURED']})",
-                 f"num_killed({collision_id},{row['NUMBER OF PERSON KILLED']})",]  # due to initial number
+                 f"num_killed({collision_id},{row['NUMBER OF PERSON KILLED']})"]  # due to initial number
+                
+        # individua il traffico corrispondente all'incidente
+        traffic_row= traffic.loc[(traffic['Y'] == row['Y']) &
+                            (traffic['M'] == row['M']) &
+                            (traffic['D'] == row['D']) &
+                            (traffic['HH'] == row['HH']) &
+                            (traffic['MM'] == row['MM']) &
+                            (traffic['BOROUGH'] == row['BOROUGH']) &
+                            ((traffic['TRAFFIC STREET'] == row['STREET NAME']) |
+                            (traffic['TRAFFIC STREET'] == row['CROSS STREET NAME']) |
+                            (traffic['TRAFFIC STREET'] == row['OFF STREET NAME']))]
+    
+        if not traffic_row.empty:
+            traffic_id = f"traffic({traffic_row['TRAFFIC ID'].values[0]})"
+            info.append(f"has_Traffic({collision_id}, {traffic_id})")
+        
+        # individua il meteo corrispondente all'incidente
+        weather_row= weather.loc[(weather['Y'] == row['Y']) &
+                            (weather['M'] == row['M']) &
+                            (weather['D'] == row['D']) &
+                            (weather['HH'] == row['HH'])]
+    
+        if not weather_row.empty:
+            weather_date = f"weather({row['Y']}-{row['M']}-{row['D']} {row['HH']}:00:00)"
+            info.append(f"has_Weather({collision_id}, {weather_date})")
 
         action(info)
     
     #Inserimento dati per il Traffico
     for index, row in traffic.iterrows():
         traffic_id = f"traffic({row['TRAFFIC ID']})"
-        data = f"{row['Y']}-{row['M']}-{row['D']}T{row['HH']}:{row['MM']}:00"
+        data = f"{row['Y']}-{row['M']}-{row['D']} {row['HH']}:{row['MM']}:00"
         info = [f"year({traffic_id}, {row['Y']})",
                 f"month({traffic_id},{row['M']})",
                 f"day({traffic_id},{row['D']})",
@@ -51,7 +76,7 @@ def load_data_in_kb(accidents: pd.DataFrame, traffic: pd.DataFrame, weather: pd.
 
     #Inserimento dati per il Meteo
     for index, row in weather.iterrows():
-        data = f"{row['Y']}-{row['M']}-{row['D']}T{row['HH']}:00:00"
+        data = f"{row['Y']}-{row['M']}-{row['D']} {row['HH']}:00:00"
         info = [f"temperature({data}, {row['temperature_2m (°C)']})",
                 f"precipitation({data},{row['precipitation (mm)']})",
                 f"rain({data},{row['rain (mm)']})",
@@ -84,13 +109,13 @@ def create_prolog_kb():
 
 def datetime_to_prolog_fact(datetime_str: str) -> str:
     dt = date_time_from_dataset(datetime_str)
-    datetime_str = "date({}, {}, {}, {}, {}, {})".format(dt.year, dt.month, dt.day,
+    datetime_str = "date({}-{}-{} {}:{}:{})".format(dt.year, dt.month, dt.day,
                                                          dt.hour, dt.minute, dt.second)
     return f"datime({datetime_str})"
 
 
 def date_time_from_dataset(datetime_str: str) -> datetime:
-    return datetime.datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M:%S')
+    return datetime.datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
 
 
 def main():
