@@ -1,11 +1,12 @@
+import datetime
 import pandas as pd
 
-def load_data_in_kb(dataset: pd.DataFrame, kb=None):
+def load_data_in_kb(accidents: pd.DataFrame, traffic: pd.DataFrame, weather: pd.DataFrame, kb=None):
 
     prolog_file = None
 
     if kb is None:
-        prolog_file = open("informazioni.pl", "w")
+        prolog_file = open("data/informazioni.pl", "w")
         action = lambda fact_list: assert_all_in_file(fact_list, prolog_file)
     else:
         action = lambda fact_list: assert_all(fact_list, kb)
@@ -13,74 +14,52 @@ def load_data_in_kb(dataset: pd.DataFrame, kb=None):
     action([":-style_check(-discontiguous)"])
 
     #Inserimento dati per gli Incidenti
-    for index, row in dataset.iterrows():
-        case_num = f"crime({row['CASE_NUMBER']})"
-        facts = [f"location_description({case_num}, location({row['Location Description']}))",
-                 f"beat({case_num},{row['Beat']})",
-                 f"district({case_num},{row['District']})",
-                 f"comm_area({case_num},{row['Community Area']})",
-                 f"ward({case_num},{row['Ward']})",
-                 f"crime_date({case_num}, {datetime_to_prolog_fact(row['Date'])})",
-                 f"block({case_num}, {'block_' + row['Block']})"]  # due to initial number
+    for index, row in accidents.iterrows():
+        collision_id = f"accident({row['COLLISION_ID']})"
+        data = f"{row['Y']}-{row['M']}-{row['D']}T{row['HH']}:{row['MM']}:00"
+        info = [f"year({collision_id}, {row['Y']})",
+                 f"month({collision_id},{row['M']})",
+                 f"day({collision_id},{row['D']})",
+                 f"hour({collision_id},{row['HH']})",
+                 f"minutes({collision_id},{row['MM']})",
+                 f"accident-date({collision_id}, {datetime_to_prolog_fact(data)})",
+                 f"borough({collision_id},{row['BOROUGH']})",
+                 f"location({collision_id},{row['LATITUDE']}, {row['LONGITUDE']})",
+                 f"street name({collision_id},{row['STREET NAME']})",
+                 f"cross street name({collision_id},{row['CROSS STREET NAME']})",
+                 f"off street name({collision_id},{row['OFF STREET NAME']})",
+                 f"num_injured({collision_id},{row['NUMBER OF PERSON INJURED']})",
+                 f"num_killed({collision_id},{row['NUMBER OF PERSON KILLED']})",]  # due to initial number
 
-        action(facts)
+        action(info)
+    
+    #Inserimento dati per il Traffico
+    for index, row in traffic.iterrows():
+        traffic_id = f"traffic({row['TRAFFIC ID']})"
+        data = f"{row['Y']}-{row['M']}-{row['D']}T{row['HH']}:{row['MM']}:00"
+        info = [f"year({traffic_id}, {row['Y']})",
+                f"month({traffic_id},{row['M']})",
+                f"day({traffic_id},{row['D']})",
+                f"hour({traffic_id},{row['HH']})",
+                f"minutes({traffic_id},{row['MM']})",
+                f"traffic-date({traffic_id}, {datetime_to_prolog_fact(data)})",
+                f"borough({traffic_id},{row['BOROUGH']})",
+                f"volume({traffic_id},{row['VOL']})",
+                f"traffic street({traffic_id},{row['TRAFFIC STREET']})"]
 
-    # insert data for arrests
-    for index, row in arrest_df.iterrows():
-        arrest_num = f"arrest({row['ARREST_NUMBER']})"
-        facts = [f"has_arrest(crime({row['CASE_NUMBER']}), {arrest_num})",
-                 f"arrest_date({arrest_num}, {datetime_to_prolog_fact(row['ARREST DATE'])})",
-                 f"criminal_race({arrest_num},{row['criminal_race']})"]
+        action(info)
 
-        num_charges = 0
-        for i in range(1, 5):
-            if not pd.isnull(row[f"CHARGE {i} STATUTE"]):
-                num_charges += 1
-            else:
-                break
-        # note: num charges is always >= 1
-        facts.append(f"num_of_charges({arrest_num}, {num_charges})")
+    #Inserimento dati per il Meteo
+    for index, row in weather.iterrows():
+        data = f"{row['Y']}-{row['M']}-{row['D']}T{row['HH']}:00:00"
+        info = [f"temperature({data}, {row['temperature_2m (°C)']})",
+                f"precipitation({data},{row['precipitation (mm)']})",
+                f"rain({data},{row['rain (mm)']})",
+                f"cloudcover({data},{row['cloudcover_low (%)']})",
+                f"windspeed({data},{row['windspeed_10m (km/h)']})",
+                f"winddirection({data},{row['winddirection_10m (°)']})"]
 
-        action(facts)
-
-    # insert data for shoot
-    # Add info about gunshot injury
-
-    for index, row in shoot_df.iterrows():
-        victim_code = f"victim({row['VICTIM_CODE']})"
-        facts = [f"victimization(crime({row['CASE_NUMBER']}), {victim_code}, {row['VICTIMIZATION']})",
-                 f"date_shoot({victim_code}, {datetime_to_prolog_fact(row['DATE_SHOOT'])})",
-                 f"victim_race({victim_code},{row['victim_race']})",
-                 f"victim_sex({victim_code}, {row['SEX']})",
-                 f"incident({victim_code}, {row['INCIDENT']})",
-                 f"zip_code({victim_code}, {row['ZIP_CODE']})",
-                 f"victim_area({victim_code}, {row['AREA']})",
-                 f"victim_day_of_week({victim_code}, {row['DAY_OF_WEEK']})",
-                 f"state_house_district({victim_code}, {row['STATE_HOUSE_DISTRICT']})",
-                 f"state_senate_district({victim_code}, {row['STATE_SENATE_DISTRICT']})"]
-
-        # street outreach
-        if row['STREET_OUTREACH_ORGANIZATION'] != 'none':
-            facts.append(f"street_org({victim_code}, {row['STREET_OUTREACH_ORGANIZATION']})")
-
-        if not pd.isnull(row['AGE']):
-            facts.append(f"victim_age({victim_code}, {row['AGE']})")
-
-        action(facts)
-
-    # insert data for health
-
-    for index, row in health_df.iterrows():
-        comm_area_code = float(row["Community Area"])
-        facts = [f"comm_birth_rate({comm_area_code}, {row['Birth Rate']})",
-                 f"comm_assault_homicide({comm_area_code}, {row['Assault (Homicide)']})",
-                 f"comm_firearm({comm_area_code}, {row['Firearm-related']})",
-                 f"comm_poverty_level({comm_area_code}, {row['Below Poverty Level']})",
-                 f"comm_hs_diploma({comm_area_code}, {row['No High School Diploma']})",
-                 f"comm_income({comm_area_code}, {row['Per Capita Income']})",
-                 f"comm_unemployment({comm_area_code}, {row['Unemployment']})"]
-
-        action(facts)
+        action(info)
 
     if kb is not None:
         prolog_file.close()
@@ -96,12 +75,11 @@ def assert_all_in_file(facts, kb_file):
 
 
 def create_prolog_kb():
-    crimes_df = pd.read_csv(CLEAN_CRIME_PATH)
-    arrest_df = pd.read_csv(CLEAN_ARREST_PATH)
-    shoot_df = pd.read_csv(CLEAN_SHOOT_PATH)
-    health_df = pd.read_csv(HEALTH_DATASET_PATH)
+    accidents = pd.read_csv("data/Selected Accidents.csv")
+    traffic = pd.read_csv("data/Selected Traffic.csv")
+    weather = pd.read_csv("data/Selected Weather.csv")
 
-    load_data_in_kb(crimes_df=crimes_df, arrest_df=arrest_df, shoot_df=shoot_df, health_df=health_df)
+    load_data_in_kb(accidents, traffic, weather)
 
 
 def datetime_to_prolog_fact(datetime_str: str) -> str:
@@ -112,20 +90,12 @@ def datetime_to_prolog_fact(datetime_str: str) -> str:
 
 
 def date_time_from_dataset(datetime_str: str) -> datetime:
-    return datetime.strptime(datetime_str, '%m/%d/%Y %I:%M:%S %p')
+    return datetime.datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M:%S')
 
 
 def main():
-    crime_codes = extract_crime_codes()
-    clean_crime_dataset: pd.DataFrame = preprocess_crimes_dataset(extract_crime_dataset(crime_codes))
-    clean_crime_dataset.to_csv(CLEAN_CRIME_PATH, index=False)
-
-    clean_arrest_dataset: pd.DataFrame = preprocess_arrest_dataset(extract_arrest_dataset(crime_codes))
-    clean_arrest_dataset.to_csv(CLEAN_ARREST_PATH, index=False)
-
-    clean_shoot_dataset: pd.DataFrame = preprocess_shoot_dataset(extract_shoot_dataset(crime_codes))
-    clean_shoot_dataset.to_csv(CLEAN_SHOOT_PATH, index=False)
+    create_prolog_kb()
 
 
 main()
-create_prolog_kb()
+
