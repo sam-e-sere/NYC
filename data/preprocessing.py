@@ -53,7 +53,7 @@ def extract_weather():
 
 
     # visualizza il dataframe risultante
-    weather.to_csv("data/New NYC Weather.csv", index=False, mode='w')
+    weather.to_csv("data/working_dataset/New NYC Weather.csv", index=False, mode='w')
 
 
 
@@ -107,7 +107,7 @@ def extract_accidents():
     accidents = accidents.dropna(subset=['LATITUDE', 'LONGITUDE'])
 
     # visualizza il dataframe risultante
-    accidents.to_csv("data/New NYC Accidents.csv", index=False, mode='w')
+    accidents.to_csv("data/working_dataset/New NYC Accidents.csv", index=False, mode='w')
 
 
 #Estrazione delle informazioni necessarie del file 'NYC Accidents'
@@ -159,14 +159,14 @@ def extract_traffic():
 
 
     # visualizza il dataframe risultante
-    traffic.to_csv("data/New NYC Traffic.csv", index=False, mode='w')
+    traffic.to_csv("data/working_dataset/New NYC Traffic.csv", index=False, mode='w')
 
 
 def union_dataset():
 
-    incidenti = pd.read_csv("data/Complete Accidents.csv")
-    meteo = pd.read_csv("data/New NYC Weather.csv")
-    traffico = pd.read_csv("data/New NYC Traffic.csv")
+    incidenti = pd.read_csv("data/working_dataset/Complete Accidents.csv")
+    meteo = pd.read_csv("data/working_dataset/New NYC Weather.csv")
+    traffico = pd.read_csv("data/working_dataset/New NYC Traffic.csv")
 
     incidenti['MM'] = incidenti['MM'].astype(int)
 
