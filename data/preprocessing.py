@@ -94,15 +94,12 @@ def extract_accidents():
 
     # rimuovi la colonna "time" originale
     accidents = accidents.drop('CRASH TIME', axis=1)
-
-    # Aggiungi una colonna ID con valori sequenziali
-    accidents.insert(0, 'ACCIDENT ID', range(1, len(accidents)+1))
-
-    # riordina le colonne in base all'ordine desiderato
-    accidents = accidents.reindex(columns=['ID','Y', 'M', 'D','HH','MM'] + list(accidents.columns[:-5]))
     
     # rimuovi le colonne non necessarie
-    accidents = accidents.drop(['ZIP CODE','LOCATION', 'NUMBER OF PEDESTRIANS INJURED','NUMBER OF PEDESTRIANS KILLED','NUMBER OF CYCLIST INJURED','NUMBER OF CYCLIST KILLED','NUMBER OF MOTORIST INJURED','NUMBER OF MOTORIST KILLED','CONTRIBUTING FACTOR VEHICLE 1','CONTRIBUTING FACTOR VEHICLE 2','CONTRIBUTING FACTOR VEHICLE 3','CONTRIBUTING FACTOR VEHICLE 4','CONTRIBUTING FACTOR VEHICLE 5','COLLISION_ID','VEHICLE TYPE CODE 1','VEHICLE TYPE CODE 2','VEHICLE TYPE CODE 3','VEHICLE TYPE CODE 4','VEHICLE TYPE CODE 5'], axis=1)
+    accidents = accidents.drop(['ZIP CODE','LOCATION', 'NUMBER OF PEDESTRIANS INJURED','NUMBER OF PEDESTRIANS KILLED','NUMBER OF CYCLIST INJURED','NUMBER OF CYCLIST KILLED','NUMBER OF MOTORIST INJURED','NUMBER OF MOTORIST KILLED','CONTRIBUTING FACTOR VEHICLE 1','CONTRIBUTING FACTOR VEHICLE 2','CONTRIBUTING FACTOR VEHICLE 3','CONTRIBUTING FACTOR VEHICLE 4','CONTRIBUTING FACTOR VEHICLE 5','VEHICLE TYPE CODE 1','VEHICLE TYPE CODE 2','VEHICLE TYPE CODE 3','VEHICLE TYPE CODE 4','VEHICLE TYPE CODE 5'], axis=1)
+
+    # riordina le colonne in base all'ordine desiderato
+    accidents = accidents.reindex(columns=['COLLISION_ID','Y', 'M', 'D','HH','MM','BOROUGH','LATITUDE','LONGITUDE','ON STREET NAME','CROSS STREET NAME','OFF STREET NAME','NUMBER OF PERSON INJURED','NUMBER OF PERSON KILLED'])
 
     accidents = accidents.apply(lambda x: x.str.upper() if x.dtype == "object" else x)
 
@@ -169,47 +166,32 @@ def union_dataset():
 
     incidenti = pd.read_csv("data/Complete Accidents.csv")
     meteo = pd.read_csv("data/New NYC Weather.csv")
+    traffico = pd.read_csv("data/New NYC Traffic.csv")
 
     incidenti['MM'] = incidenti['MM'].astype(int)
 
     trasformazione = lambda x: '00' if x<8 else ('15' if x<24 else ('30' if x<38 else '45'))
     incidenti['MM'] = incidenti['MM'].apply(trasformazione)
 
+    incidenti['MM'] = incidenti['MM'].astype(int)
 
-    incidente_meteo = pd.merge(incidenti, meteo, on=['Y','M','D','HH'], how='inner')
 
-    # visualizza il dataframe risultante
-    incidente_meteo.to_csv("data/Accidents Weather.csv", index=False, mode='w')
-    
-
-def traffico_incidenti():
-
-    incidenti_meteo = pd.read_csv("data/Accidents Weather.csv")
-    traffico = pd.read_csv("data/New NYC Traffic.csv")
+    incidenti_meteo = pd.merge(incidenti, meteo, on=['Y','M','D','HH'], how='inner')
 
     #rinomina delle colonne del dataset
     incidenti_meteo = incidenti_meteo.rename(columns={'ON STREET NAME':'STREET NAME'})
 
     merged1 = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'HH', 'MM', 'BOROUGH','STREET NAME'], how='inner')
 
-    # visualizza il dataframe risultante
-    merged1.to_csv("data/working_dataset/merge_on_street.csv", index=False, mode='w')
-
     #rinomina delle colonne del dataset
     traffico = traffico.rename(columns={'STREET NAME':'CROSS STREET NAME'})
 
     merged2 = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'HH', 'MM', 'BOROUGH', 'CROSS STREET NAME'], how='inner')
 
-    # visualizza il dataframe risultante
-    merged2.to_csv("data/working_dataset/merge_cross_street.csv", index=False, mode='w')
-
     #rinomina delle colonne del dataset
     traffico = traffico.rename(columns={'CROSS STREET NAME':'OFF STREET NAME'})
 
     merged3 = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'HH', 'MM', 'BOROUGH', 'OFF STREET NAME'], how='inner')
-
-    # visualizza il dataframe risultante
-    merged3.to_csv("data/working_dataset/merge_off_street.csv", index=False, mode='w')
 
     # concatena i due DataFrame lungo l'asse delle righe
     concatenaz = pd.concat([merged1, merged2, merged3], axis=0)
@@ -223,17 +205,32 @@ def traffico_incidenti():
     # elimina le righe duplicate, tranne la prima occorrenza
     concatenaz.drop_duplicates(subset=['Y','M','D','HH','MM', 'BOROUGH','STREET NAME', 'CROSS STREET NAME', 'OFF STREET NAME'], keep='first', inplace=True)
 
-    # visualizza il dataframe risultante
-    concatenaz.to_csv("data/Final Dataset.csv", index=False, mode='w')
+    # aggiorno dataset di traffico solo con TRAFFIC ID e STREET NAME
+    traffico = traffico.drop(['BOROUGH','Y','M','D','HH','MM','VOL'],axis=1)
+    
+    traffico = traffico.rename(columns={'OFF STREET NAME':'TRAFFIC STREET'})
+
+    final = pd.merge(concatenaz, traffico, on='TRAFFIC ID', how='inner')
+
+
+    selected_weather = final.loc[:, ['Y', 'M', 'D', 'HH', 'temperature_2m (°C)','precipitation (mm)','rain (mm)','cloudcover_low (%)','windspeed_10m (km/h)','winddirection_10m (°)']]
+    
+    selected_accidents = final.loc[:,['COLLISION_ID','Y', 'M', 'D', 'HH','MM','BOROUGH','LATITUDE','LONGITUDE','STREET NAME','CROSS STREET NAME','OFF STREET NAME','NUMBER OF PERSON INJURED','NUMBER OF PERSON KILLED']]
+
+    selected_traffic = final.loc[:,['TRAFFIC ID','Y', 'M', 'D', 'HH','MM','BOROUGH','VOL','TRAFFIC STREET']]
+
+    # visualizza i dataframe risultanti
+    selected_weather.to_csv("data/Selected Weather.csv", index=False, mode='w')
+    selected_accidents.to_csv("data/Selected Accidents.csv", index=False, mode='w')
+    selected_traffic.to_csv("data/Selected Traffic.csv", index=False, mode='w')
 
 
 
 def main():
-    extract_weather()
-    extract_accidents()
-    extract_traffic()
-    borough_prediction()
+    #extract_weather()
+    #extract_accidents()
+    #extract_traffic()
+    #borough_prediction()
     union_dataset()
-    traffico_incidenti()
 
 main()
