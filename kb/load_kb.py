@@ -76,7 +76,7 @@ def load_data_in_kb(accidents: pd.DataFrame, traffic: pd.DataFrame, weather: pd.
 
     #Inserimento dati per il Meteo
     for index, row in weather.iterrows():
-        data = f"{row['Y']}-{row['M']}-{row['D']} {row['HH']}:00:00"
+        data = f"{int(row['Y'])}-{int(row['M'])}-{int(row['D'])} {int(row['HH'])}:00:00"
         info = [f"temperature({datetime_to_prolog_fact(data)}, {row['temperature_2m (°C)']})",
                 f"precipitation({datetime_to_prolog_fact(data)},{row['precipitation (mm)']})",
                 f"rain({datetime_to_prolog_fact(data)},{row['rain (mm)']})",
@@ -111,7 +111,7 @@ def datetime_to_prolog_fact(datetime_str: str) -> str:
     dt = date_time_from_dataset(datetime_str)
     datetime_str = "date({}-{}-{} {}:{}:{})".format(dt.year, dt.month, dt.day,
                                                          dt.hour, dt.minute, dt.second)
-    return f"datime({datetime_str})"
+    return f"{datetime_str}"
 
 
 def date_time_from_dataset(datetime_str: str) -> datetime:
