@@ -19,7 +19,7 @@ def create_kb() -> Prolog:
 
     # conteggi geografici
     prolog.assertz("number_of_accidents_in_borough(Borough, Count) :- borough(accident(ID), Borough), findall(ID, borough(accident(ID), Borough), IDs), length(IDs, Count).")
-    prolog.assertz("same_beat(crime(C1), crime(C2)) :- beat(crime(C1), B), beat(crime(C2), B)")
+    prolog.assertz("number_of_accidents_on_street(Street, Count) :- street_name(accident(ID), Street), findall(ID, street_name(accident(ID), Street), IDs), length(IDs, Count).")
     prolog.assertz("same_ward(crime(C1), crime(C2)) :- ward(crime(C1), W), ward(crime(C2), W)")
     prolog.assertz("same_comm_area(crime(C1), crime(C2)) :- comm_area(crime(C1), COM), comm_area(crime(C2), COM)")
     prolog.assertz("same_block(crime(C1), crime(C2)) :- block(crime(C1), B), block(crime(C2), B)")
