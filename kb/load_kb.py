@@ -77,12 +77,12 @@ def load_data_in_kb(accidents: pd.DataFrame, traffic: pd.DataFrame, weather: pd.
     #Inserimento dati per il Meteo
     for index, row in weather.iterrows():
         data = f"{row['Y']}-{row['M']}-{row['D']} {row['HH']}:00:00"
-        info = [f"temperature({data}, {row['temperature_2m (°C)']})",
-                f"precipitation({data},{row['precipitation (mm)']})",
-                f"rain({data},{row['rain (mm)']})",
-                f"cloudcover({data},{row['cloudcover_low (%)']})",
-                f"windspeed({data},{row['windspeed_10m (km/h)']})",
-                f"winddirection({data},{row['winddirection_10m (°)']})"]
+        info = [f"temperature({datetime_to_prolog_fact(data)}, {row['temperature_2m (°C)']})",
+                f"precipitation({datetime_to_prolog_fact(data)},{row['precipitation (mm)']})",
+                f"rain({datetime_to_prolog_fact(data)},{row['rain (mm)']})",
+                f"cloudcover({datetime_to_prolog_fact(data)},{row['cloudcover_low (%)']})",
+                f"windspeed({datetime_to_prolog_fact(data)},{row['windspeed_10m (km/h)']})",
+                f"winddirection({datetime_to_prolog_fact(data)},{row['winddirection_10m (°)']})"]
 
         action(info)
 

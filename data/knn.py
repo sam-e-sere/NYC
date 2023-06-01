@@ -8,7 +8,7 @@ from sklearn.model_selection import GridSearchCV, train_test_split, validation_c
 
 def borough_prediction():
     # Carica il dataset
-    dataset = pd.read_csv("data/New NYC Accidents.csv")
+    dataset = pd.read_csv("data/working_dataset/New NYC Accidents.csv")
 
     # Separa i dati con BOROUGH not null e BOROUGH null
     dataset_train = dataset.dropna(subset=["BOROUGH"])  # Dati con BOROUGH not null
@@ -88,4 +88,4 @@ def borough_prediction():
     # Aggiungi i valori predetti al dataset originale
     dataset.loc[dataset["BOROUGH"].isnull(), "BOROUGH"] = y_pred_missing
 
-    dataset.to_csv("data/Complete Accidents.csv", index=False, mode='w')
+    dataset.to_csv("data/working_dataset/Complete Accidents.csv", index=False, mode='w')

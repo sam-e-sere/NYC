@@ -41,11 +41,16 @@ def extract_weather():
     # rimuovi la colonna "time" originale
     weather = weather.drop('TIME', axis=1)
 
+    weather['Y'] = weather['Y'].astype(int)
+    weather['M'] = weather['M'].astype(int)
+    weather['D'] = weather['D'].astype(int)
+    weather['HH'] = weather['HH'].astype(int)
+
     # riordina le colonne in base all'ordine desiderato
     weather = weather.reindex(columns=['Y', 'M', 'D', 'HH'] + list(weather.columns[:-4]))
 
     # seleziona solo le righe con l'anno 2020 
-    weather = weather.loc[(weather['Y'] == '2019') | (weather['Y'] == '2020')]
+    weather = weather.loc[(weather['Y'] == 2019) | (weather['Y'] == 2020)]
 
     # rimuovi le tre colonne che riguardano il cloudcover -> è utile solo cloudcover_low
     weather = weather.drop(['cloudcover (%)','cloudcover_mid (%)','cloudcover_high (%)'], axis=1)
@@ -227,10 +232,10 @@ def union_dataset():
 
 
 def main():
-    #extract_weather()
-    #extract_accidents()
-    #extract_traffic()
-    #borough_prediction()
+    extract_weather()
+    extract_accidents()
+    extract_traffic()
+    borough_prediction()
     union_dataset()
 
 main()
