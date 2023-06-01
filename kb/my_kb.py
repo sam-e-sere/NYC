@@ -4,36 +4,40 @@ import pandas as pd
 from pyswip import Prolog
 
 
-def assert_clauses_info(kb):
-    with open("locations.pl", "r") as loc_file:
+"""
+def assert_clauses_facts(kb):
+    with open("clauses.pl", "r") as loc_file:
         lines = loc_file.readlines()
         for line in lines:
             kb.assertz(line)
-
+"""
 
 def create_kb() -> Prolog:
     prolog = Prolog()
 
-    prolog.consult("information.pl")
-    assert_clauses_info(kb=prolog)
+    prolog.consult("data/facts.pl")
+    #assert_clauses_facts(kb=prolog)
+    kb=prolog
 
     # conteggi geografici
-    prolog.assertz("number_of_accidents_in_borough(Borough, Count) :- borough(accident(ID), Borough), findall(ID, borough(accident(ID), Borough), IDs), length(IDs, Count).")
-    prolog.assertz("number_of_accidents_on_street(Street, Count) :- street_name(accident(ID), Street), findall(ID, street_name(accident(ID), Street), IDs), length(IDs, Count).")
-    prolog.assertz("same_ward(crime(C1), crime(C2)) :- ward(crime(C1), W), ward(crime(C2), W)")
-    prolog.assertz("same_comm_area(crime(C1), crime(C2)) :- comm_area(crime(C1), COM), comm_area(crime(C2), COM)")
-    prolog.assertz("same_block(crime(C1), crime(C2)) :- block(crime(C1), B), block(crime(C2), B)")
-    prolog.assertz("num_of_crimes_in_district(crime(C), N) :- "
-                   "findall(C1, same_district(crime(C), crime(C1)), L), length(L, N)")
-    prolog.assertz("num_of_crimes_in_beat(crime(C), N) :- findall(C1, same_beat(crime(C), crime(C1)), L), length(L, N)")
-    prolog.assertz("num_of_crimes_community_area(crime(C), N) :- "
-                   "findall(C1, same_comm_area(crime(C), crime(C1)), L), length(L, N)")
-    prolog.assertz("num_of_crimes_ward(crime(C), N) :- findall(C1, same_ward(crime(C), crime(C1)), L), length(L, N)")
-    prolog.assertz("num_of_crimes_block(crime(C), N) :- findall(C1, same_block(crime(C), crime(C1)), L), length(L, N)")
+    prolog.assertz("number_of_accidents_in_borough(accident(ID), Count) :- borough(accident(ID), Borough), findall(ID, borough(accident(ID), Borough), IDs), length(IDs, Count).")
+    prolog.assertz("number_of_accidents_on_street(accident(ID), Count) :- street_name(accident(ID), Street), findall(ID, street_name(accident(ID), Street), IDs), length(IDs, Count).")
+    prolog.assertz("number_of_accidents_on_cross_street(accident(ID), Count) :- cross_street_name(accident(ID), CrossStreet), findall(ID, cross_street_name(accident(ID), CrossStreet), IDs), length(IDs, Count).")
+    prolog.assertz("number_of_accidents_on_off_street(accident(ID), Count) :- off_street_name(accident(ID), OffStreet), findall(ID, off_street_name(accident(ID), OffStreet), IDs), length(IDs, Count).")
+    prolog.assertz("accidents_same_borough(accident(ID1), accident(ID2)) :- borough(accident(ID1), Borough), borough(accident(ID2), Borough), ID1 \= ID2.")
+    prolog.assertz("accidents_same_street(accident(ID1), accident(ID2)) :- street_name(accident(ID1), Street), street_name(accident(ID2), Street), ID1 \= ID2.")
+    prolog.assertz("accidents_same_cross_street(accident(ID1), accident(ID2)) :- cross_street_name(accident(ID1), CrossStreet), cross_street_name(accident(ID2), CrossStreet), ID1 \= ID2.")
+    prolog.assertz("accidents_same_off_street(accident(ID1), accident(ID2)) :- off_street_name(accident(ID1), OffStreet), off_street_name(accident(ID2), OffStreet), ID1 \= ID2.")
 
-    # CLAUSES ABOUT GEO-DATA coming from VICTIMIZATION
-    prolog.assertz("crime_zip_code(crime(C), Z) :- victimization(crime(C), victim(V), T), zip_code(victim(V), Z)")
-    prolog.assertz("same_zip_code(crime(C1), crime(C2)) :- crime_zip_code(crime(C1), Z), crime_zip_code(crime(C2), Z)")
+    # conteggi sulla data/tempo
+    prolog.assertz("time_of_day(accident(ID), TimeOfDay) :- hour(accident(ID), Hour), (Hour >= 6, Hour < 12, TimeOfDay = 'mattina'; Hour >= 12, Hour < 18, TimeOfDay = 'pomeriggio'; Hour >= 18, Hour < 24, TimeOfDay = 'sera'; Hour >= 0, Hour < 6, TimeOfDay = 'notte')")
+    
+    #gravità (0 feriti e 0 morti = lieve, 1/+ feriti e 0 morti = moderato, 0/+ feriti e 1/+ morti = grave)
+    prolog.assertz("severity(accident(ID), Severity) :- num_injured(accident(ID), NumInjured), num_killed(accident(ID), NumKilled), (NumInjured = 0, NumKilled = 0, Severity = 'lieve'; (NumInjured > 1, NumKilled = 0), Severity = 'moderato'; (NumInjured >= 0, NumKilled > 0), Severity = 'grave').")
+    prolog.assertz("is_fatal(accident(ID)) :- severity(accident(ID), 'grave').")
+
+    """
+    
     prolog.assertz("num_of_crimes_in_zip_code(crime(C), N) :- "
                    "findall(C1, same_zip_code(crime(C), crime(C1)), L), length(L, N)")
 
@@ -117,71 +121,28 @@ def create_kb() -> Prolog:
         prolog.assertz(f"location_{value}(crime(C)) :- location_description(crime(C), location(L)), "
                        f"is_{value}(location(L))")
 
+    """
     return prolog
 
 
 # suppongo che ci sia già
-def calculate_features(kb, crime_id, final=False) -> dict:
+def calculate_features(kb, accident_id, final=False) -> dict:
     features_dict = {}
 
-    features_dict["CASE_NUMBER"] = crime_id
+    features_dict["COLLISION_ID"] = accident_id
 
-    crime_id = f"crime({crime_id})"
+    accident_id = f"accident({accident_id})"
 
-    features_dict["NUM_CRIMES_DISTRICT"] = list(kb.query(f"num_of_crimes_in_district({crime_id}, N)"))[0]["N"]
-    features_dict["NUM_CRIMES_BEAT"] = list(kb.query(f"num_of_crimes_in_beat({crime_id}, N)"))[0]["N"]
-    features_dict["NUM_CRIMES_COMM_AREA"] = list(kb.query(f"num_of_crimes_community_area({crime_id}, N)"))[0]["N"]
-    features_dict["NUM_CRIMES_WARD"] = list(kb.query(f"num_of_crimes_ward({crime_id}, N)"))[0]["N"]
-    features_dict["NUM_CRIMES_BLOCK"] = list(kb.query(f"num_of_crimes_block({crime_id}, N)"))[0]["N"]
-    features_dict["NUM_CRIMES_ZIP_CODE"] = list(kb.query(f"num_of_crimes_in_zip_code({crime_id}, N)"))[0]["N"]
-    features_dict["NUM_CRIMES_STREET_ORG"] = list(kb.query(f"num_of_crimes_street_organization({crime_id}, N)"))[0]["N"]
+    features_dict["NUM_ACCIDENTS_BOROUGH"] = kb.query_1(f"num_of_accidents_in_borough({accident_id}, Count)")
+    features_dict["NUM_ACCIDENTS_ON_STREET"] = kb.query_1(f"num_of_accidents_on_street({accident_id}, Count)")
+    features_dict["NUM_ACCIDENTS_CROSS_STREET"] = kb.query_1(f"num_of_accidents_on_cross_street({accident_id}, Count)")
+    features_dict["NUM_ACCIDENTS_ON_OFF_STREET"] = kb.query_1(f"num_of_accidents_on_off_street({accident_id}, Count)")    
+    features_dict["NUM_ACCIDENTS_ON_OFF_STREET"] = kb.query_1(f"num_of_accidents_on_off_street({accident_id}, Count)")    
+    features_dict["TIME_OF_DAY"] = kb.query_1(f"time_of_day({accident_id}, TimeOfDay)")   
+    features_dict["SEVERITY"] = kb.query_1(f"severity({accident_id}, Severity)") 
+    features_dict["IS_FATAL"] = query_boolean_result(kb, f"is_fatal({accident_id})")
 
-    features_dict["AREA_INCOME"] = list(kb.query(f"crime_area_income({crime_id}, N)"))[0]["N"]
-    features_dict["AREA_ASSAULT_HOMICIDE"] = list(kb.query(f"crime_area_assault_homicide({crime_id}, N)"))[0]["N"]
-    features_dict["AREA_FIREARM"] = list(kb.query(f"crime_area_firearm({crime_id}, N)"))[0]["N"]
-    features_dict["AREA_POVERTY_HEALTH"] = list(kb.query(f"crime_area_poverty_level({crime_id}, N)"))[0]["N"]
-    features_dict["AREA_HIGH_SCHOOL_DIPLOMA"] = list(kb.query(f"crime_area_hs_diploma({crime_id}, N)"))[0]["N"]
-    features_dict["AREA_UNEMPLOYMENT"] = list(kb.query(f"crime_area_unemployment({crime_id}, N)"))[0]["N"]
-    features_dict["AREA_BIRTH_RATE"] = list(kb.query(f"crime_area_birth_rate({crime_id}, N)"))[0]["N"]
-
-    features_dict["NUM_OF_DEAD"] = list(kb.query(f"num_of_dead({crime_id}, N)"))[0]["N"]
-    features_dict["NUM_OF_ARREST"] = list(kb.query(f"num_of_arrest({crime_id}, N)"))[0]["N"]
-    features_dict["NUM_OF_VICTIMS"] = list(kb.query(f"num_of_victims({crime_id}, N)"))[0]["N"]
-
-    features_dict["IS_DOMESTIC"] = query_boolean_result(kb, f"is_domestic({crime_id})")
-    features_dict["NIGHT_CRIME"] = query_boolean_result(kb, f"night_crime({crime_id})")
-    features_dict["IS_KILLED_A_CHILD"] = query_boolean_result(kb, f"is_killed_a_child({crime_id})")
-    features_dict["MULTIPLE_ARRESTS"] = query_boolean_result(kb, f"crime_by_group({crime_id})")
-    features_dict["HAS_STREET_ORGANIZATION"] = query_boolean_result(kb, f"has_street_organization({crime_id})")
-    features_dict["IS_RATIAL"] = query_boolean_result(kb, f"is_ratial({crime_id})")
-
-    arrested_race_list = list(kb.query(f"crime_arrested_race({crime_id}, PR)"))
-    arrested_race_set = {arrested_race_list[0]['PR']}
-    for i in range(1, len(arrested_race_list)):
-        arrested_race_set.add(arrested_race_list[i]['PR'])
-    features_dict["ARRESTED_RACE"] = next(iter(arrested_race_set)) if len(arrested_race_set) == 1 else "mixed"
-
-    victim_race_list = list(kb.query(f"crime_victim_race({crime_id}, VR)"))
-    victim_race_set = {victim_race_list[0]['VR']}
-    for i in range(1, len(victim_race_list)):
-        victim_race_set.add(victim_race_list[i]['VR'])
-    features_dict["VICTIM_RACE"] = next(iter(victim_race_set)) if len(victim_race_set) == 1 else "mixed"
-
-    victim_sex_list = list(kb.query(f"crime_victim_sex({crime_id}, S)"))
-    victim_sex_set = {victim_sex_list[0]['S']}
-    for i in range(1, len(victim_sex_list)):
-        victim_sex_set.add(victim_sex_list[i]['S'])
-    features_dict["VICTIM_SEX"] = next(iter(victim_sex_set)) if len(victim_sex_set) == 1 else "mixed"
-
-    aver_age = list(kb.query(f"aver_age({crime_id}, Avg)"))
-    features_dict["AVER_AGE"] = aver_age[0]['Avg'] if len(aver_age) == 1 else None
-
-    features_dict["AVG_NUM_CHARGES"] = list(kb.query(f"avg_num_charge({crime_id}, Avg)"))[0]['Avg']
-
-    features_dict["IMMEDIATE_ARREST"] = query_boolean_result(kb, f"immediate_arrest({crime_id})")
-    features_dict["SAME_MONTH_ARREST"] = query_boolean_result(kb, f"same_month_arrest({crime_id})")
-    features_dict["IS_HOMICIDE"] = query_boolean_result(kb, f"is_homicide({crime_id})")
-
+    """
     if final:
         # added after Naive Bayes Categorical results
         for value in ["vehicle", "private_vehicle", "public_vehicle", "public_place", "parking", "store_pub", "gas_station",
@@ -189,6 +150,7 @@ def calculate_features(kb, crime_id, final=False) -> dict:
                       "residential_outside"]:
             features_dict[f"LOCATION_{value}"] = query_boolean_result(kb, f"location_{value}({crime_id})")
 
+    """
     return features_dict
 
 
@@ -199,14 +161,14 @@ def query_boolean_result(kb, query_str: str):
 def produce_working_dataset(kb: Prolog, path: str, final=False):
     print(f"Producing dataset at {path}")
     start = time.time()
-    crimes_complete: pd.DataFrame = pd.read_csv("crimes_selected.csv")
+    accidents_complete: pd.DataFrame = pd.read_csv("Selected Accidents.csv")
 
     extracted_values_df = None
 
     first = True
-    for crime_id in crimes_complete["CASE_NUMBER"]:
+    for accident_id in accidents_complete["COLLISION_ID"]:
 
-        features_dict = calculate_features(kb, crime_id, final)
+        features_dict = calculate_features(kb, accident_id, final)
         if first:
             extracted_values_df = pd.DataFrame([features_dict])
             first = False
@@ -220,4 +182,4 @@ def produce_working_dataset(kb: Prolog, path: str, final=False):
 
 knowledge_base = create_kb()
 produce_working_dataset(knowledge_base, "working_dataset.csv")
-produce_working_dataset(knowledge_base, "working_dataset_final.csv", final=True)
+#produce_working_dataset(knowledge_base, "working_dataset_final.csv", final=True)
