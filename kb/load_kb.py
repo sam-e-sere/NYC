@@ -28,8 +28,8 @@ def load_data_in_kb(accidents: pd.DataFrame, traffic: pd.DataFrame, weather: pd.
                  f"street_name({collision_id},'{row['STREET NAME']}')",
                  f"cross_street_name({collision_id},'{row['CROSS STREET NAME']}')",
                  f"off_street_name({collision_id},'{row['OFF STREET NAME']}')",
-                 f"num_injured({collision_id},{row['NUMBER OF PERSON INJURED']})",
-                 f"num_killed({collision_id},{row['NUMBER OF PERSON KILLED']})"]  # due to initial number
+                 f"num_injured({collision_id},{row['NUMBER OF PERSONS INJURED']})",
+                 f"num_killed({collision_id},{row['NUMBER OF PERSONS KILLED']})"]  # due to initial number
                 
         # individua il traffico corrispondente all'incidente
         traffic_row= traffic.loc[(traffic['Y'] == row['Y']) &

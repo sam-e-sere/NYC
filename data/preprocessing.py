@@ -103,10 +103,8 @@ def extract_accidents():
     # rimuovi le colonne non necessarie
     accidents = accidents.drop(['ZIP CODE','LOCATION', 'NUMBER OF PEDESTRIANS INJURED','NUMBER OF PEDESTRIANS KILLED','NUMBER OF CYCLIST INJURED','NUMBER OF CYCLIST KILLED','NUMBER OF MOTORIST INJURED','NUMBER OF MOTORIST KILLED','CONTRIBUTING FACTOR VEHICLE 1','CONTRIBUTING FACTOR VEHICLE 2','CONTRIBUTING FACTOR VEHICLE 3','CONTRIBUTING FACTOR VEHICLE 4','CONTRIBUTING FACTOR VEHICLE 5','VEHICLE TYPE CODE 1','VEHICLE TYPE CODE 2','VEHICLE TYPE CODE 3','VEHICLE TYPE CODE 4','VEHICLE TYPE CODE 5'], axis=1)
 
-    # riordina le colonne in base all'ordine desiderato
-    accidents = accidents.reindex(columns=['COLLISION_ID','Y', 'M', 'D','HH','MM','BOROUGH','LATITUDE','LONGITUDE','ON STREET NAME','CROSS STREET NAME','OFF STREET NAME','NUMBER OF PERSON INJURED','NUMBER OF PERSON KILLED'])
-
-    accidents = accidents.apply(lambda x: x.str.upper() if x.dtype == "object" else x)
+    column_order = ['COLLISION_ID', 'Y', 'M', 'D', 'HH', 'MM', 'BOROUGH', 'LATITUDE', 'LONGITUDE', 'ON STREET NAME', 'CROSS STREET NAME', 'OFF STREET NAME', 'NUMBER OF PERSONS INJURED', 'NUMBER OF PERSONS KILLED']
+    accidents = accidents.reindex(columns=column_order)
 
     # rimuove le righe con valori mancanti nelle colonne "LATITUDE" e "LONGITUDE"
     accidents = accidents.dropna(subset=['LATITUDE', 'LONGITUDE'])
@@ -220,7 +218,7 @@ def union_dataset():
 
     selected_weather = final.loc[:, ['Y', 'M', 'D', 'HH', 'temperature_2m (°C)','precipitation (mm)','rain (mm)','cloudcover_low (%)','windspeed_10m (km/h)','winddirection_10m (°)']]
     
-    selected_accidents = final.loc[:,['COLLISION_ID','Y', 'M', 'D', 'HH','MM','BOROUGH','LATITUDE','LONGITUDE','STREET NAME','CROSS STREET NAME','OFF STREET NAME','NUMBER OF PERSON INJURED','NUMBER OF PERSON KILLED']]
+    selected_accidents = final.loc[:,['COLLISION_ID','Y', 'M', 'D', 'HH','MM','BOROUGH','LATITUDE','LONGITUDE','STREET NAME','CROSS STREET NAME','OFF STREET NAME','NUMBER OF PERSONS INJURED','NUMBER OF PERSONS KILLED']]
 
     selected_traffic = final.loc[:,['TRAFFIC ID','Y', 'M', 'D', 'HH','MM','BOROUGH','VOL','TRAFFIC STREET']]
 

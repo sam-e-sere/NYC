@@ -20,21 +20,21 @@ def create_kb() -> Prolog:
     kb=prolog
 
     # conteggi geografici
-    prolog.assertz("number_of_accidents_in_borough(accident(ID), Count) :- borough(accident(ID), Borough), findall(ID, borough(accident(ID), Borough), IDs), length(IDs, Count).")
-    prolog.assertz("number_of_accidents_on_street(accident(ID), Count) :- street_name(accident(ID), Street), findall(ID, street_name(accident(ID), Street), IDs), length(IDs, Count).")
-    prolog.assertz("number_of_accidents_on_cross_street(accident(ID), Count) :- cross_street_name(accident(ID), CrossStreet), findall(ID, cross_street_name(accident(ID), CrossStreet), IDs), length(IDs, Count).")
-    prolog.assertz("number_of_accidents_on_off_street(accident(ID), Count) :- off_street_name(accident(ID), OffStreet), findall(ID, off_street_name(accident(ID), OffStreet), IDs), length(IDs, Count).")
-    prolog.assertz("accidents_same_borough(accident(ID1), accident(ID2)) :- borough(accident(ID1), Borough), borough(accident(ID2), Borough), ID1 \= ID2.")
-    prolog.assertz("accidents_same_street(accident(ID1), accident(ID2)) :- street_name(accident(ID1), Street), street_name(accident(ID2), Street), ID1 \= ID2.")
-    prolog.assertz("accidents_same_cross_street(accident(ID1), accident(ID2)) :- cross_street_name(accident(ID1), CrossStreet), cross_street_name(accident(ID2), CrossStreet), ID1 \= ID2.")
-    prolog.assertz("accidents_same_off_street(accident(ID1), accident(ID2)) :- off_street_name(accident(ID1), OffStreet), off_street_name(accident(ID2), OffStreet), ID1 \= ID2.")
+    prolog.assertz("number_of_accidents_in_borough(accident(ID), Count) :- borough(accident(ID), Borough), findall(ID, borough(accident(ID), Borough), IDs), length(IDs, Count)")
+    prolog.assertz("number_of_accidents_on_street(accident(ID), Count) :- street_name(accident(ID), Street), findall(ID, street_name(accident(ID), Street), IDs), length(IDs, Count)")
+    prolog.assertz("number_of_accidents_on_cross_street(accident(ID), Count) :- cross_street_name(accident(ID), CrossStreet), findall(ID, cross_street_name(accident(ID), CrossStreet), IDs), length(IDs, Count)")
+    prolog.assertz("number_of_accidents_on_off_street(accident(ID), Count) :- off_street_name(accident(ID), OffStreet), findall(ID, off_street_name(accident(ID), OffStreet), IDs), length(IDs, Count)")
+    prolog.assertz("accidents_same_borough(accident(ID1), accident(ID2)) :- borough(accident(ID1), Borough), borough(accident(ID2), Borough), ID1 \= ID2")
+    prolog.assertz("accidents_same_street(accident(ID1), accident(ID2)) :- street_name(accident(ID1), Street), street_name(accident(ID2), Street), ID1 \= ID2")
+    prolog.assertz("accidents_same_cross_street(accident(ID1), accident(ID2)) :- cross_street_name(accident(ID1), CrossStreet), cross_street_name(accident(ID2), CrossStreet), ID1 \= ID2")
+    prolog.assertz("accidents_same_off_street(accident(ID1), accident(ID2)) :- off_street_name(accident(ID1), OffStreet), off_street_name(accident(ID2), OffStreet), ID1 \= ID2")
 
     # conteggi sulla data/tempo
     prolog.assertz("time_of_day(accident(ID), TimeOfDay) :- hour(accident(ID), Hour), (Hour >= 6, Hour < 12, TimeOfDay = 'mattina'; Hour >= 12, Hour < 18, TimeOfDay = 'pomeriggio'; Hour >= 18, Hour < 24, TimeOfDay = 'sera'; Hour >= 0, Hour < 6, TimeOfDay = 'notte')")
     
     #gravità (0 feriti e 0 morti = lieve, 1/+ feriti e 0 morti = moderato, 0/+ feriti e 1/+ morti = grave)
-    prolog.assertz("severity(accident(ID), Severity) :- num_injured(accident(ID), NumInjured), num_killed(accident(ID), NumKilled), (NumInjured = 0, NumKilled = 0, Severity = 'lieve'; (NumInjured > 1, NumKilled = 0), Severity = 'moderato'; (NumInjured >= 0, NumKilled > 0), Severity = 'grave').")
-    prolog.assertz("is_fatal(accident(ID)) :- severity(accident(ID), 'grave').")
+    prolog.assertz("severity(accident(ID), Severity) :- num_injured(accident(ID), NumInjured), num_killed(accident(ID), NumKilled), (NumInjured = 0, NumKilled = 0, Severity = 'lieve'; (NumInjured > 1, NumKilled = 0), Severity = 'moderato'; (NumInjured >= 0, NumKilled > 0), Severity = 'grave')")
+    prolog.assertz("is_fatal(accident(ID)) :- severity(accident(ID), 'grave')")
 
     """
     
@@ -132,14 +132,14 @@ def calculate_features(kb, accident_id, final=False) -> dict:
     features_dict["COLLISION_ID"] = accident_id
 
     accident_id = f"accident({accident_id})"
-
-    features_dict["NUM_ACCIDENTS_BOROUGH"] = kb.query_1(f"num_of_accidents_in_borough({accident_id}, Count)")
-    features_dict["NUM_ACCIDENTS_ON_STREET"] = kb.query_1(f"num_of_accidents_on_street({accident_id}, Count)")
-    features_dict["NUM_ACCIDENTS_CROSS_STREET"] = kb.query_1(f"num_of_accidents_on_cross_street({accident_id}, Count)")
-    features_dict["NUM_ACCIDENTS_ON_OFF_STREET"] = kb.query_1(f"num_of_accidents_on_off_street({accident_id}, Count)")    
-    features_dict["NUM_ACCIDENTS_ON_OFF_STREET"] = kb.query_1(f"num_of_accidents_on_off_street({accident_id}, Count)")    
-    features_dict["TIME_OF_DAY"] = kb.query_1(f"time_of_day({accident_id}, TimeOfDay)")   
-    features_dict["SEVERITY"] = kb.query_1(f"severity({accident_id}, Severity)") 
+    
+    features_dict["NUM_ACCIDENTS_BOROUGH"] = kb.query(f"num_of_accidents_in_borough({accident_id}, Count)")
+    features_dict["NUM_ACCIDENTS_ON_STREET"] = kb.query(f"num_of_accidents_on_street({accident_id}, Count)")
+    features_dict["NUM_ACCIDENTS_CROSS_STREET"] = kb.query(f"num_of_accidents_on_cross_street({accident_id}, Count)")
+    features_dict["NUM_ACCIDENTS_ON_OFF_STREET"] = kb.query(f"num_of_accidents_on_off_street({accident_id}, Count)")    
+    features_dict["NUM_ACCIDENTS_ON_OFF_STREET"] = kb.query(f"num_of_accidents_on_off_street({accident_id}, Count)")    
+    features_dict["TIME_OF_DAY"] = kb.query(f"time_of_day({accident_id}, TimeOfDay)")   
+    features_dict["SEVERITY"] = kb.query(f"severity({accident_id}, Severity)") 
     features_dict["IS_FATAL"] = query_boolean_result(kb, f"is_fatal({accident_id})")
 
     """
@@ -161,7 +161,7 @@ def query_boolean_result(kb, query_str: str):
 def produce_working_dataset(kb: Prolog, path: str, final=False):
     print(f"Producing dataset at {path}")
     start = time.time()
-    accidents_complete: pd.DataFrame = pd.read_csv("Selected Accidents.csv")
+    accidents_complete: pd.DataFrame = pd.read_csv("data/Selected Accidents.csv")
 
     extracted_values_df = None
 
