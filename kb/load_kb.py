@@ -23,11 +23,11 @@ def load_data_in_kb(accidents: pd.DataFrame, traffic: pd.DataFrame, weather: pd.
                  f"hour({collision_id},{row['HH']})",
                  f"minutes({collision_id},{row['MM']})",
                  f"accident_date({collision_id}, {datetime_to_prolog_fact(data)})",
-                 f"borough({collision_id},{row['BOROUGH']})",
+                 f"borough({collision_id},'{row['BOROUGH']}')",
                  f"location({collision_id},{row['LATITUDE']}, {row['LONGITUDE']})",
-                 f"street_name({collision_id},{row['STREET NAME']})",
-                 f"cross_street_name({collision_id},{row['CROSS STREET NAME']})",
-                 f"off_street_name({collision_id},{row['OFF STREET NAME']})",
+                 f"street_name({collision_id},'{row['STREET NAME']}')",
+                 f"cross_street_name({collision_id},'{row['CROSS STREET NAME']}')",
+                 f"off_street_name({collision_id},'{row['OFF STREET NAME']}')",
                  f"num_injured({collision_id},{row['NUMBER OF PERSON INJURED']})",
                  f"num_killed({collision_id},{row['NUMBER OF PERSON KILLED']})"]  # due to initial number
                 
@@ -68,9 +68,9 @@ def load_data_in_kb(accidents: pd.DataFrame, traffic: pd.DataFrame, weather: pd.
                 f"hour({traffic_id},{row['HH']})",
                 f"minutes({traffic_id},{row['MM']})",
                 f"traffic_date({traffic_id}, {datetime_to_prolog_fact(data)})",
-                f"borough({traffic_id},{row['BOROUGH']})",
+                f"borough({traffic_id},'{row['BOROUGH']}')",
                 f"volume({traffic_id},{row['VOL']})",
-                f"traffic_street({traffic_id},{row['TRAFFIC STREET']})"]
+                f"traffic_street({traffic_id},'{row['TRAFFIC STREET']}')"]
 
         action(info)
 
