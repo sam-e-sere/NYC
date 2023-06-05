@@ -53,7 +53,7 @@ def borough_prediction():
     # Visualizza l'andamento dell'accuratezza al variare di k
     plt.plot(k_values, mean_train_scores, label='Training accuracy')
     plt.fill_between(k_values, mean_train_scores - std_train_scores, mean_train_scores + std_train_scores, alpha=0.1)
-    plt.plot(k_values, mean_test_scores, label='Validation accuracy')
+    plt.plot(k_values, mean_test_scores, label='Test accuracy')
     plt.fill_between(k_values, mean_test_scores - std_test_scores, mean_test_scores + std_test_scores, alpha=0.1)
     plt.title("Andamento dell'accuratezza al variare di k")
     plt.xlabel("k")
