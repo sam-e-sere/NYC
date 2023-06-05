@@ -31,7 +31,7 @@ def create_kb() -> Prolog:
     
     #gravità (0 feriti e 0 morti = lieve, 1/+ feriti e 0 morti = moderato, 0/+ feriti e 1/+ morti = grave)
     prolog.assertz("severity(accident(ID), Severity) :- num_injured(accident(ID), NumInjured), num_killed(accident(ID), NumKilled), (NumInjured = 0, NumKilled = 0, Severity = 'lieve'; NumInjured >= 1, NumKilled = 0, Severity = 'moderato'; NumInjured >= 0, NumKilled > 0, Severity = 'grave')")
-    #prolog.assertz("is_fatal(accident(ID)) :- severity(accident(ID), 'grave')")
+    prolog.assertz("is_not_fatal(accident(ID)) :- severity(accident(ID), 'lieve')")
 
     return prolog
 
@@ -49,7 +49,7 @@ def calculate_features(kb, accident_id, final=False) -> dict:
     features_dict["TIME_OF_DAY"] = list(kb.query(f"time_of_day({accident_id}, TimeOfDay)"))[0]["TimeOfDay"]
     features_dict["SEVERITY"] = list(kb.query(f"severity({accident_id}, Severity)"))[0]["Severity"]
 
-    #features_dict["IS_FATAL"] = query_boolean_result(kb, f"is_fatal({accident_id})")
+    features_dict["IS_NOT_FATAL"] = query_boolean_result(kb, f"is_not_fatal({accident_id})")
 
     """
     if final:
