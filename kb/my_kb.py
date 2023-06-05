@@ -20,11 +20,11 @@ def create_kb() -> Prolog:
     kb=prolog
 
     # conteggi geografici
-    prolog.assertz("accidents_same_borough(accident(ID1), accident(ID2)) :- borough(accident(ID1), Borough), borough(accident(ID2), Borough), ID1 \= ID2")
-    prolog.assertz("accidents_same_street(accident(ID1), accident(ID2)) :- street_name(accident(ID1), Street), street_name(accident(ID2), Street), ID1 \= ID2")
+    prolog.assertz("accidents_same_borough(accident(ID1), accident(ID2)) :- borough(accident(ID1), Borough), borough(accident(ID2), Borough)")
+    prolog.assertz("accidents_same_street(accident(ID1), accident(ID2)) :- street_name(accident(ID1), Street), street_name(accident(ID2), Street)")
 
     prolog.assertz("num_of_accidents_in_borough(accident(ID), Count) :- findall(ID1, accidents_same_borough(accident(ID), accident(ID1)), L), length(L, Count)")
-    prolog.assertz("num_of_accidents_on_street(accident(ID), Count) :- street_name(accident(ID), OnStreet), (OnStreet = 'unknown' -> Count = 'null' ; OnStreet \\= 'unknown', findall(ID1, accidents_same_street(accident(ID), accident(ID1)), L), length(L, Count))")
+    prolog.assertz("num_of_accidents_on_street(accident(ID), Count) :- street_name(accident(ID), OnStreet), borough(accident(ID), Borough), (OnStreet = 'unknown' -> Count = 'null' ; OnStreet \\= 'unknown', findall(ID1, accidents_same_street(accident(ID), accident(ID1)), borough(accident(ID1), Borough), L), length(L, Count))")
 
     # conteggi sulla data/tempo
     prolog.assertz("time_of_day(accident(ID), TimeOfDay) :- hour(accident(ID), Hour), (Hour >= 6, Hour < 12, TimeOfDay = 'morning'; Hour >= 12, Hour < 18, TimeOfDay = 'afternoon'; Hour >= 18, Hour < 24, TimeOfDay = 'evening'; Hour >= 0, Hour < 6, TimeOfDay = 'night')")
@@ -40,9 +40,10 @@ def create_kb() -> Prolog:
     prolog.assertz("cloudcover(accident(ID)) :- has_Weather(accident(ID), Data), cloudcover(Data,Cloud), Cloud > 70")
     prolog.assertz("wind_intensity(accident(ID), WindIntensity) :- has_Weather(accident(ID), Data), windspeed(Data,Wind), (Wind > 0, Wind =< 19, WindIntensity = 'weak'; Wind > 19, Wind =< 39, WindIntensity = 'moderate'; Wind > 39, Wind =< 59, WindIntensity = 'strong'; Wind > 59, Wind =< 74, WindIntensity = 'gale'; Wind > 74, Wind =< 89, WindIntensity = 'strong gale'; Wind >= 90, WindIntensity = 'storm'; Wind = 0.0, WindIntensity = 'null')")
     
-    
-    
-    
+    #traffico
+    prolog.assertz("traffic_volume(accident(ID), Volume) :- has_Traffic(accident(ID), traffic(TrafficID)), volume(traffic(TrafficID), Vol), (Vol < 100, Volume = 'light'; Vol > 500, Volume = 'heavy'; Vol >= 100, Vol =< 500, Volume = 'medium')")
+    #prolog.assertz("volume_count(accident(ID), Volume) :- has_Traffic(accident(ID), traffic(TrafficID), volume(traffic(TrafficID), Volume)")
+    prolog.assertz("volume_sum_same_location(accident(ID), TotalVolume) :- findall(Vol, (accidents_same_borough(accident(ID), accident(ID1)), accidents_same_street(accident(ID), accident(ID1)), borough(accident(ID1), Borough), street_name(accident(ID1), Street), has_Traffic(accident(ID1), traffic(TrafficID)), volume(traffic(TrafficID), Vol)), Volumes), sum_list(Volumes, TotalVolume)")
     
     prolog.assertz("is_not_fatal(accident(ID)) :- severity(accident(ID), 'minor')")
 
@@ -68,6 +69,9 @@ def calculate_features(kb, accident_id, final=False) -> dict:
     features_dict["RAIN_INTENSITY"] = list(kb.query(f"rain_intensity({accident_id}, RainIntensity)"))[0]["RainIntensity"]
     features_dict["CLOUDCOVER"] = query_boolean_result(kb, f"cloudcover({accident_id})")
     features_dict["WIND_INTENSITY"] = list(kb.query(f"wind_intensity({accident_id}, WindIntensity)"))[0]["WindIntensity"]
+
+    features_dict["TRAFFIC_VOLUME"] = list(kb.query(f"traffic_volume({accident_id}, Volume)"))[0]["Volume"]
+    features_dict["SOMMA"] = list(kb.query(f"volume_sum_same_location({accident_id}, TotalVolume)"))[0]["TotalVolume"]
 
     features_dict["IS_NOT_FATAL"] = query_boolean_result(kb, f"is_not_fatal({accident_id})")
 
