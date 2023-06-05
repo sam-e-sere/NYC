@@ -215,12 +215,14 @@ def union_dataset():
 
     final = pd.merge(concatenaz, traffico, on='TRAFFIC ID', how='inner')
 
-
     selected_weather = final.loc[:, ['Y', 'M', 'D', 'HH', 'temperature_2m (°C)','precipitation (mm)','rain (mm)','cloudcover_low (%)','windspeed_10m (km/h)','winddirection_10m (°)']]
     
     selected_accidents = final.loc[:,['COLLISION_ID','Y', 'M', 'D', 'HH','MM','BOROUGH','LATITUDE','LONGITUDE','STREET NAME','CROSS STREET NAME','OFF STREET NAME','NUMBER OF PERSONS INJURED','NUMBER OF PERSONS KILLED']]
 
     selected_traffic = final.loc[:,['TRAFFIC ID','Y', 'M', 'D', 'HH','MM','BOROUGH','VOL','TRAFFIC STREET']]
+
+    selected_accidents.fillna('unknown', inplace=True)
+
 
     # visualizza i dataframe risultanti
     selected_weather.to_csv("data/Selected Weather.csv", index=False, mode='w')
