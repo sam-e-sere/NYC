@@ -24,8 +24,8 @@ def create_kb() -> Prolog:
     prolog.assertz("accidents_same_street(accident(ID1), accident(ID2)) :- street_name(accident(ID1), Street), street_name(accident(ID2), Street)")
 
     prolog.assertz("num_of_accidents_in_borough(accident(ID), Count) :- findall(ID1, accidents_same_borough(accident(ID), accident(ID1)), L), length(L, Count)")
-    prolog.assertz("num_of_accidents_on_street(accident(ID), Count) :- street_name(accident(ID), OnStreet), borough(accident(ID), Borough), (OnStreet = 'unknown' -> Count = 'null' ; OnStreet \\= 'unknown', findall(ID1, accidents_same_street(accident(ID), accident(ID1)), borough(accident(ID1), Borough), L), length(L, Count))")
-
+    prolog.assertz("num_of_accidents_on_street(accident(ID), Count) :- street_name(accident(ID), OnStreet), borough(accident(ID), Borough), (OnStreet = 'unknown' -> Count = 'null' ; OnStreet \\= 'unknown', findall(StreetID, (street_name(accident(StreetID), OnStreet), borough(accident(StreetID), Borough)), StreetIDs), sort(StreetIDs, UniqueStreetIDs), length(UniqueStreetIDs, Count))")
+   
     # conteggi sulla data/tempo
     prolog.assertz("time_of_day(accident(ID), TimeOfDay) :- hour(accident(ID), Hour), (Hour >= 6, Hour < 12, TimeOfDay = 'morning'; Hour >= 12, Hour < 18, TimeOfDay = 'afternoon'; Hour >= 18, Hour < 24, TimeOfDay = 'evening'; Hour >= 0, Hour < 6, TimeOfDay = 'night')")
     
@@ -42,11 +42,12 @@ def create_kb() -> Prolog:
     
     #traffico
     prolog.assertz("traffic_volume(accident(ID), Volume) :- has_Traffic(accident(ID), traffic(TrafficID)), volume(traffic(TrafficID), Vol), (Vol < 100, Volume = 'light'; Vol > 500, Volume = 'heavy'; Vol >= 100, Vol =< 500, Volume = 'medium')")
+    
     #prolog.assertz("volume_count(accident(ID), Volume) :- has_Traffic(accident(ID), traffic(TrafficID), volume(traffic(TrafficID), Volume)")
     prolog.assertz("volume_sum_same_location(accident(ID), TotalVolume) :- findall(Vol, (accidents_same_borough(accident(ID), accident(ID1)), accidents_same_street(accident(ID), accident(ID1)), borough(accident(ID1), Borough), street_name(accident(ID1), Street), has_Traffic(accident(ID1), traffic(TrafficID)), volume(traffic(TrafficID), Vol)), Volumes), sum_list(Volumes, TotalVolume)")
     
     prolog.assertz("is_not_fatal(accident(ID)) :- severity(accident(ID), 'minor')")
-
+    prolog.assertz("average_volume_same_location(accident(ID), AvgVolume) :- num_of_accidents_on_street(accident(ID), NumAccidents), (NumAccidents = 'null' -> AvgVolume = 'null'; volume_sum_same_location(accident(ID), TotalVolume), AvgVolume is TotalVolume / NumAccidents)")
 
 
     return prolog
@@ -71,7 +72,7 @@ def calculate_features(kb, accident_id, final=False) -> dict:
     features_dict["WIND_INTENSITY"] = list(kb.query(f"wind_intensity({accident_id}, WindIntensity)"))[0]["WindIntensity"]
 
     features_dict["TRAFFIC_VOLUME"] = list(kb.query(f"traffic_volume({accident_id}, Volume)"))[0]["Volume"]
-    features_dict["SOMMA"] = list(kb.query(f"volume_sum_same_location({accident_id}, TotalVolume)"))[0]["TotalVolume"]
+    features_dict["MEDIA"] = round(list(kb.query(f"average_volume_same_location({accident_id}, AvgVolume)"))[0]["AvgVolume"],2)
 
     features_dict["IS_NOT_FATAL"] = query_boolean_result(kb, f"is_not_fatal({accident_id})")
 
