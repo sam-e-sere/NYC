@@ -30,7 +30,7 @@ def create_kb() -> Prolog:
     prolog.assertz("time_of_day(accident(ID), TimeOfDay) :- hour(accident(ID), Hour), (Hour >= 6, Hour < 12, TimeOfDay = 'mattina'; Hour >= 12, Hour < 18, TimeOfDay = 'pomeriggio'; Hour >= 18, Hour < 24, TimeOfDay = 'sera'; Hour >= 0, Hour < 6, TimeOfDay = 'notte')")
     
     #gravità (0 feriti e 0 morti = lieve, 1/+ feriti e 0 morti = moderato, 0/+ feriti e 1/+ morti = grave)
-    #prolog.assertz("severity(accident(ID), Severity) :- num_injured(accident(ID), NumInjured), num_killed(accident(ID), NumKilled), (NumInjured = 0, NumKilled = 0, Severity = 'lieve'); (NumInjured > 1, NumKilled = 0, Severity = 'moderato'); (NumInjured >= 0, NumKilled > 0, Severity = 'grave')")
+    prolog.assertz("severity(accident(ID), Severity) :- num_injured(accident(ID), NumInjured), num_killed(accident(ID), NumKilled), (NumInjured = 0, NumKilled = 0, Severity = 'lieve'; NumInjured >= 1, NumKilled = 0, Severity = 'moderato'; NumInjured >= 0, NumKilled > 0, Severity = 'grave')")
     #prolog.assertz("is_fatal(accident(ID)) :- severity(accident(ID), 'grave')")
 
     return prolog
@@ -43,11 +43,11 @@ def calculate_features(kb, accident_id, final=False) -> dict:
     features_dict["COLLISION_ID"] = accident_id
 
     accident_id = f"accident({accident_id})"
-    
+
     features_dict["NUM_ACCIDENTS_BOROUGH"] = list(kb.query(f"num_of_accidents_in_borough({accident_id}, Count)"))[0]["Count"]
     features_dict["NUM_ACCIDENTS_ON_STREET"] = list(kb.query(f"num_of_accidents_on_street({accident_id}, Count)"))[0]["Count"]
     features_dict["TIME_OF_DAY"] = list(kb.query(f"time_of_day({accident_id}, TimeOfDay)"))[0]["TimeOfDay"]
-    #features_dict["SEVERITY"] = list(kb.query(f"severity({accident_id}, Severity)"))[0]["Severity"]
+    features_dict["SEVERITY"] = list(kb.query(f"severity({accident_id}, Severity)"))[0]["Severity"]
 
     #features_dict["IS_FATAL"] = query_boolean_result(kb, f"is_fatal({accident_id})")
 
