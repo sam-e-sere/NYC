@@ -25,9 +25,7 @@ def load_data_in_kb(accidents: pd.DataFrame, traffic: pd.DataFrame, weather: pd.
                  f"accident_date({collision_id}, {datetime_to_prolog_fact(data)})",
                  f"borough({collision_id},'{row['BOROUGH']}')",
                  f"location({collision_id},{row['LATITUDE']}, {row['LONGITUDE']})",
-                 f"street_name({collision_id},'{row['STREET NAME']}')",
-                 f"cross_street_name({collision_id},'{row['CROSS STREET NAME']}')",
-                 f"off_street_name({collision_id},'{row['OFF STREET NAME']}')",
+                 f"street_name({collision_id},'{row['TRAFFIC STREET']}')",
                  f"num_injured({collision_id},{row['NUMBER OF PERSONS INJURED']})",
                  f"num_killed({collision_id},{row['NUMBER OF PERSONS KILLED']})"]  # due to initial number
                 
@@ -38,9 +36,7 @@ def load_data_in_kb(accidents: pd.DataFrame, traffic: pd.DataFrame, weather: pd.
                             (traffic['HH'] == row['HH']) &
                             (traffic['MM'] == row['MM']) &
                             (traffic['BOROUGH'] == row['BOROUGH']) &
-                            ((traffic['TRAFFIC STREET'] == row['STREET NAME']) |
-                            (traffic['TRAFFIC STREET'] == row['CROSS STREET NAME']) |
-                            (traffic['TRAFFIC STREET'] == row['OFF STREET NAME']))]
+                            ((traffic['TRAFFIC STREET'] == row['TRAFFIC STREET']))]
     
         if not traffic_row.empty:
             traffic_id = f"traffic({traffic_row['TRAFFIC ID'].values[0]})"

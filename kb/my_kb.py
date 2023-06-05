@@ -22,13 +22,9 @@ def create_kb() -> Prolog:
     # conteggi geografici
     prolog.assertz("accidents_same_borough(accident(ID1), accident(ID2)) :- borough(accident(ID1), Borough), borough(accident(ID2), Borough), ID1 \= ID2")
     prolog.assertz("accidents_same_street(accident(ID1), accident(ID2)) :- street_name(accident(ID1), Street), street_name(accident(ID2), Street), ID1 \= ID2")
-    prolog.assertz("accidents_same_cross_street(accident(ID1), accident(ID2)) :- cross_street_name(accident(ID1), CrossStreet), cross_street_name(accident(ID2), CrossStreet), ID1 \= ID2")
-    prolog.assertz("accidents_same_off_street(accident(ID1), accident(ID2)) :- off_street_name(accident(ID1), OffStreet), off_street_name(accident(ID2), OffStreet), ID1 \= ID2")
 
     prolog.assertz("num_of_accidents_in_borough(accident(ID), Count) :- findall(ID1, accidents_same_borough(accident(ID), accident(ID1)), L), length(L, Count)")
     prolog.assertz("num_of_accidents_on_street(accident(ID), Count) :- street_name(accident(ID), OnStreet), (OnStreet = 'unknown' -> Count = 'null' ; OnStreet \\= 'unknown', findall(ID1, accidents_same_street(accident(ID), accident(ID1)), L), length(L, Count))")
-    prolog.assertz("num_of_accidents_on_cross_street(accident(ID), Count) :- cross_street_name(accident(ID), CrossStreet), (CrossStreet = 'unknown' -> Count = 'null' ; CrossStreet \\= 'unknown', findall(ID1, accidents_same_cross_street(accident(ID), accident(ID1)), L), length(L, Count))")
-    prolog.assertz("num_of_accidents_on_off_street(accident(ID), Count) :- off_street_name(accident(ID), OffStreet), (OffStreet = 'unknown' -> Count = 'null' ; OffStreet \\= 'unknown', findall(ID1, accidents_same_off_street(accident(ID), accident(ID1)), L), length(L, Count))")
 
     # conteggi sulla data/tempo
     prolog.assertz("time_of_day(accident(ID), TimeOfDay) :- hour(accident(ID), Hour), (Hour >= 6, Hour < 12, TimeOfDay = 'mattina'; Hour >= 12, Hour < 18, TimeOfDay = 'pomeriggio'; Hour >= 18, Hour < 24, TimeOfDay = 'sera'; Hour >= 0, Hour < 6, TimeOfDay = 'notte')")
@@ -50,8 +46,6 @@ def calculate_features(kb, accident_id, final=False) -> dict:
     
     features_dict["NUM_ACCIDENTS_BOROUGH"] = list(kb.query(f"num_of_accidents_in_borough({accident_id}, Count)"))[0]["Count"]
     features_dict["NUM_ACCIDENTS_ON_STREET"] = list(kb.query(f"num_of_accidents_on_street({accident_id}, Count)"))[0]["Count"]
-    features_dict["NUM_ACCIDENTS_CROSS_STREET"] = list(kb.query(f"num_of_accidents_on_cross_street({accident_id}, Count)"))[0]["Count"]
-    features_dict["NUM_ACCIDENTS_OFF_STREET"] = list(kb.query(f"num_of_accidents_on_off_street({accident_id}, Count)"))[0]["Count"]
     features_dict["TIME_OF_DAY"] = list(kb.query(f"time_of_day({accident_id}, TimeOfDay)"))[0]["TimeOfDay"]
     #features_dict["SEVERITY"] = list(kb.query(f"severity({accident_id}, Severity)"))[0]["Severity"]
 
