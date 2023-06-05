@@ -27,11 +27,26 @@ def create_kb() -> Prolog:
     prolog.assertz("num_of_accidents_on_street(accident(ID), Count) :- street_name(accident(ID), OnStreet), (OnStreet = 'unknown' -> Count = 'null' ; OnStreet \\= 'unknown', findall(ID1, accidents_same_street(accident(ID), accident(ID1)), L), length(L, Count))")
 
     # conteggi sulla data/tempo
-    prolog.assertz("time_of_day(accident(ID), TimeOfDay) :- hour(accident(ID), Hour), (Hour >= 6, Hour < 12, TimeOfDay = 'mattina'; Hour >= 12, Hour < 18, TimeOfDay = 'pomeriggio'; Hour >= 18, Hour < 24, TimeOfDay = 'sera'; Hour >= 0, Hour < 6, TimeOfDay = 'notte')")
+    prolog.assertz("time_of_day(accident(ID), TimeOfDay) :- hour(accident(ID), Hour), (Hour >= 6, Hour < 12, TimeOfDay = 'morning'; Hour >= 12, Hour < 18, TimeOfDay = 'afternoon'; Hour >= 18, Hour < 24, TimeOfDay = 'evening'; Hour >= 0, Hour < 6, TimeOfDay = 'night')")
     
     #gravità (0 feriti e 0 morti = lieve, 1/+ feriti e 0 morti = moderato, 0/+ feriti e 1/+ morti = grave)
-    prolog.assertz("severity(accident(ID), Severity) :- num_injured(accident(ID), NumInjured), num_killed(accident(ID), NumKilled), (NumInjured = 0, NumKilled = 0, Severity = 'lieve'; NumInjured >= 1, NumKilled = 0, Severity = 'moderato'; NumInjured >= 0, NumKilled > 0, Severity = 'grave')")
-    prolog.assertz("is_not_fatal(accident(ID)) :- severity(accident(ID), 'lieve')")
+    prolog.assertz("severity(accident(ID), Severity) :- num_injured(accident(ID), NumInjured), num_killed(accident(ID), NumKilled), (NumInjured = 0, NumKilled = 0, Severity = 'minor'; NumInjured >= 1, NumKilled = 0, Severity = 'moderate'; NumInjured >= 0, NumKilled > 0, Severity = 'major')")
+    
+    
+    #meteo
+    #prolog.assertz("rain(accident(ID)) :- has_Weather(accident(ID), Data), rain(Data,Rain), Rain > 0.0")
+    prolog.assertz("temperature_classification(accident(ID), Temperature) :- has_Weather(accident(ID), Data), temperature(Data,Temp), (Temp < 10.0, Temperature = 'cold'; Temp > 26.0, Temperature = 'hot'; Temp >= 10.0, Temp =< 26.0, Temperature = 'mild')")
+    prolog.assertz("rain_intensity(accident(ID), RainIntensity) :- has_Weather(accident(ID), Data), rain(Data,Rain), (Rain >= 0.1, Rain =< 4, RainIntensity = 'weak'; Rain > 4, Rain =< 6, RainIntensity = 'moderate'; Rain > 6, Rain =< 10, RainIntensity = 'heavy'; Rain > 10, RainIntensity = 'shower activity'; Rain = 0.0, RainIntensity = 'null')")
+    prolog.assertz("cloudcover(accident(ID)) :- has_Weather(accident(ID), Data), cloudcover(Data,Cloud), Cloud > 70")
+    prolog.assertz("wind_intensity(accident(ID), WindIntensity) :- has_Weather(accident(ID), Data), windspeed(Data,Wind), (Wind > 0, Wind =< 19, WindIntensity = 'weak'; Wind > 19, Wind =< 39, WindIntensity = 'moderate'; Wind > 39, Wind =< 59, WindIntensity = 'strong'; Wind > 59, Wind =< 74, WindIntensity = 'gale'; Wind > 74, Wind =< 89, WindIntensity = 'strong gale'; Wind >= 90, WindIntensity = 'storm'; Wind = 0.0, WindIntensity = 'null')")
+    
+    
+    
+    
+    
+    prolog.assertz("is_not_fatal(accident(ID)) :- severity(accident(ID), 'minor')")
+
+
 
     return prolog
 
@@ -48,6 +63,11 @@ def calculate_features(kb, accident_id, final=False) -> dict:
     features_dict["NUM_ACCIDENTS_ON_STREET"] = list(kb.query(f"num_of_accidents_on_street({accident_id}, Count)"))[0]["Count"]
     features_dict["TIME_OF_DAY"] = list(kb.query(f"time_of_day({accident_id}, TimeOfDay)"))[0]["TimeOfDay"]
     features_dict["SEVERITY"] = list(kb.query(f"severity({accident_id}, Severity)"))[0]["Severity"]
+
+    features_dict["TEMPERATURE"] = list(kb.query(f"temperature_classification({accident_id}, Temperature)"))[0]["Temperature"]
+    features_dict["RAIN_INTENSITY"] = list(kb.query(f"rain_intensity({accident_id}, RainIntensity)"))[0]["RainIntensity"]
+    features_dict["CLOUDCOVER"] = query_boolean_result(kb, f"cloudcover({accident_id})")
+    features_dict["WIND_INTENSITY"] = list(kb.query(f"wind_intensity({accident_id}, WindIntensity)"))[0]["WindIntensity"]
 
     features_dict["IS_NOT_FATAL"] = query_boolean_result(kb, f"is_not_fatal({accident_id})")
 

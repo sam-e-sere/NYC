@@ -223,6 +223,8 @@ def union_dataset():
 
     selected_accidents.fillna('unknown', inplace=True)
 
+    selected_weather = selected_weather.drop_duplicates()
+    selected_traffic = selected_traffic.drop_duplicates()
 
     # visualizza i dataframe risultanti
     selected_weather.to_csv("data/Selected Weather.csv", index=False, mode='w')

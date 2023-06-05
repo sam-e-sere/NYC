@@ -16,7 +16,7 @@ def load_data_in_kb(accidents: pd.DataFrame, traffic: pd.DataFrame, weather: pd.
     #Inserimento dati per gli Incidenti
     for index, row in accidents.iterrows():
         collision_id = f"accident({row['COLLISION_ID']})"
-        data = f"{row['Y']}-{row['M']}-{row['D']} {row['HH']}:{row['MM']}:00"
+        data = f"{row['Y']}-{row['M']}-{row['D']} {row['HH']}:{row['MM']}:0"
         info = [f"year({collision_id}, {row['Y']})",
                  f"month({collision_id},{row['M']})",
                  f"day({collision_id},{row['D']})",
@@ -49,7 +49,7 @@ def load_data_in_kb(accidents: pd.DataFrame, traffic: pd.DataFrame, weather: pd.
                             (weather['HH'] == row['HH'])]
     
         if not weather_row.empty:
-            weather_date = f"weather({row['Y']}-{row['M']}-{row['D']} {row['HH']}:00:00)"
+            weather_date = f"date({row['Y']}-{row['M']}-{row['D']} {row['HH']}:0:0)"
             info.append(f"has_Weather({collision_id}, {weather_date})")
 
         action(info)
@@ -57,7 +57,7 @@ def load_data_in_kb(accidents: pd.DataFrame, traffic: pd.DataFrame, weather: pd.
     #Inserimento dati per il Traffico
     for index, row in traffic.iterrows():
         traffic_id = f"traffic({row['TRAFFIC ID']})"
-        data = f"{row['Y']}-{row['M']}-{row['D']} {row['HH']}:{row['MM']}:00"
+        data = f"{row['Y']}-{row['M']}-{row['D']} {row['HH']}:{row['MM']}:0"
         info = [f"year({traffic_id}, {row['Y']})",
                 f"month({traffic_id},{row['M']})",
                 f"day({traffic_id},{row['D']})",
@@ -72,7 +72,7 @@ def load_data_in_kb(accidents: pd.DataFrame, traffic: pd.DataFrame, weather: pd.
 
     #Inserimento dati per il Meteo
     for index, row in weather.iterrows():
-        data = f"{int(row['Y'])}-{int(row['M'])}-{int(row['D'])} {int(row['HH'])}:00:00"
+        data = f"{int(row['Y'])}-{int(row['M'])}-{int(row['D'])} {int(row['HH'])}:0:0"
         info = [f"temperature({datetime_to_prolog_fact(data)}, {row['temperature_2m (°C)']})",
                 f"precipitation({datetime_to_prolog_fact(data)},{row['precipitation (mm)']})",
                 f"rain({datetime_to_prolog_fact(data)},{row['rain (mm)']})",
