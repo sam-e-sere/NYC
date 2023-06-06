@@ -34,7 +34,6 @@ def create_kb() -> Prolog:
     
     
     #meteo
-    #prolog.assertz("rain(accident(ID)) :- has_Weather(accident(ID), Data), rain(Data,Rain), Rain > 0.0")
     prolog.assertz("temperature_classification(accident(ID), Temperature) :- has_Weather(accident(ID), Data), temperature(Data,Temp), (Temp < 10.0, Temperature = 'cold'; Temp > 26.0, Temperature = 'hot'; Temp >= 10.0, Temp =< 26.0, Temperature = 'mild')")
     prolog.assertz("rain_intensity(accident(ID), RainIntensity) :- has_Weather(accident(ID), Data), rain(Data,Rain), (Rain >= 0.1, Rain =< 4, RainIntensity = 'weak'; Rain > 4, Rain =< 6, RainIntensity = 'moderate'; Rain > 6, Rain =< 10, RainIntensity = 'heavy'; Rain > 10, RainIntensity = 'shower activity'; Rain = 0.0, RainIntensity = 'null')")
     prolog.assertz("cloudcover(accident(ID)) :- has_Weather(accident(ID), Data), cloudcover(Data,Cloud), Cloud > 70")
@@ -42,13 +41,11 @@ def create_kb() -> Prolog:
     
     #traffico
     prolog.assertz("traffic_volume(accident(ID), Volume) :- has_Traffic(accident(ID), traffic(TrafficID)), volume(traffic(TrafficID), Vol), (Vol < 100, Volume = 'light'; Vol > 500, Volume = 'heavy'; Vol >= 100, Vol =< 500, Volume = 'medium')")
-    
-    #prolog.assertz("volume_count(accident(ID), Volume) :- has_Traffic(accident(ID), traffic(TrafficID), volume(traffic(TrafficID), Volume)")
     prolog.assertz("volume_sum_same_location(accident(ID), TotalVolume) :- findall(Vol, (accidents_same_borough(accident(ID), accident(ID1)), accidents_same_street(accident(ID), accident(ID1)), borough(accident(ID1), Borough), street_name(accident(ID1), Street), has_Traffic(accident(ID1), traffic(TrafficID)), volume(traffic(TrafficID), Vol)), Volumes), sum_list(Volumes, TotalVolume)")
-    
-    prolog.assertz("is_not_fatal(accident(ID)) :- severity(accident(ID), 'minor')")
     prolog.assertz("average_volume_same_location(accident(ID), AvgVolume) :- num_of_accidents_on_street(accident(ID), NumAccidents), (NumAccidents = 'null' -> AvgVolume = 'null'; volume_sum_same_location(accident(ID), TotalVolume), AvgVolume is TotalVolume / NumAccidents)")
 
+    #incidente senza feriti e morti
+    prolog.assertz("is_not_dangerous(accident(ID)) :- severity(accident(ID), 'minor')")
 
     return prolog
 
@@ -72,9 +69,9 @@ def calculate_features(kb, accident_id, final=False) -> dict:
     features_dict["WIND_INTENSITY"] = list(kb.query(f"wind_intensity({accident_id}, WindIntensity)"))[0]["WindIntensity"]
 
     features_dict["TRAFFIC_VOLUME"] = list(kb.query(f"traffic_volume({accident_id}, Volume)"))[0]["Volume"]
-    features_dict["MEDIA"] = round(list(kb.query(f"average_volume_same_location({accident_id}, AvgVolume)"))[0]["AvgVolume"],2)
+    features_dict["AVERAGE_VOLUME"] = round(list(kb.query(f"average_volume_same_location({accident_id}, AvgVolume)"))[0]["AvgVolume"],2)
 
-    features_dict["IS_NOT_FATAL"] = query_boolean_result(kb, f"is_not_fatal({accident_id})")
+    features_dict["IS_NOT_DANGEROUS"] = query_boolean_result(kb, f"is_not_dangerous({accident_id})")
 
     """
     if final:
