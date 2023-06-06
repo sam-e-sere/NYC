@@ -24,7 +24,7 @@ def create_kb() -> Prolog:
     prolog.assertz("accidents_same_street(accident(ID1), accident(ID2)) :- street_name(accident(ID1), Street), street_name(accident(ID2), Street)")
 
     prolog.assertz("num_of_accidents_in_borough(accident(ID), Count) :- findall(ID1, accidents_same_borough(accident(ID), accident(ID1)), L), length(L, Count)")
-    prolog.assertz("num_of_accidents_on_street(accident(ID), Count) :- street_name(accident(ID), OnStreet), borough(accident(ID), Borough), (OnStreet = 'unknown' -> Count = 'null' ; OnStreet \\= 'unknown', findall(StreetID, (street_name(accident(StreetID), OnStreet), borough(accident(StreetID), Borough)), StreetIDs), sort(StreetIDs, UniqueStreetIDs), length(UniqueStreetIDs, Count))")
+    prolog.assertz("num_of_accidents_on_street(accident(ID), Count) :- street_name(accident(ID), OnStreet), borough(accident(ID), Borough), (OnStreet = 'unknown' -> Count = 'unknown' ; OnStreet \\= 'unknown', findall(StreetID, (street_name(accident(StreetID), OnStreet), borough(accident(StreetID), Borough)), StreetIDs), sort(StreetIDs, UniqueStreetIDs), length(UniqueStreetIDs, Count))")
    
     # conteggi sulla data/tempo
     prolog.assertz("time_of_day(accident(ID), TimeOfDay) :- hour(accident(ID), Hour), (Hour >= 6, Hour < 12, TimeOfDay = 'morning'; Hour >= 12, Hour < 18, TimeOfDay = 'afternoon'; Hour >= 18, Hour < 24, TimeOfDay = 'evening'; Hour >= 0, Hour < 6, TimeOfDay = 'night')")
@@ -35,14 +35,14 @@ def create_kb() -> Prolog:
     
     #meteo
     prolog.assertz("temperature_classification(accident(ID), Temperature) :- has_Weather(accident(ID), Data), temperature(Data,Temp), (Temp < 10.0, Temperature = 'cold'; Temp > 26.0, Temperature = 'hot'; Temp >= 10.0, Temp =< 26.0, Temperature = 'mild')")
-    prolog.assertz("rain_intensity(accident(ID), RainIntensity) :- has_Weather(accident(ID), Data), rain(Data,Rain), (Rain >= 0.1, Rain =< 4, RainIntensity = 'weak'; Rain > 4, Rain =< 6, RainIntensity = 'moderate'; Rain > 6, Rain =< 10, RainIntensity = 'heavy'; Rain > 10, RainIntensity = 'shower activity'; Rain = 0.0, RainIntensity = 'null')")
+    prolog.assertz("rain_intensity(accident(ID), RainIntensity) :- has_Weather(accident(ID), Data), rain(Data,Rain), (Rain >= 0.1, Rain =< 4, RainIntensity = 'weak'; Rain > 4, Rain =< 6, RainIntensity = 'moderate'; Rain > 6, Rain =< 10, RainIntensity = 'heavy'; Rain > 10, RainIntensity = 'shower activity'; Rain = 0.0, RainIntensity = 'unknown')")
     prolog.assertz("cloudcover(accident(ID)) :- has_Weather(accident(ID), Data), cloudcover(Data,Cloud), Cloud > 70")
-    prolog.assertz("wind_intensity(accident(ID), WindIntensity) :- has_Weather(accident(ID), Data), windspeed(Data,Wind), (Wind > 0, Wind =< 19, WindIntensity = 'weak'; Wind > 19, Wind =< 39, WindIntensity = 'moderate'; Wind > 39, Wind =< 59, WindIntensity = 'strong'; Wind > 59, Wind =< 74, WindIntensity = 'gale'; Wind > 74, Wind =< 89, WindIntensity = 'strong gale'; Wind >= 90, WindIntensity = 'storm'; Wind = 0.0, WindIntensity = 'null')")
+    prolog.assertz("wind_intensity(accident(ID), WindIntensity) :- has_Weather(accident(ID), Data), windspeed(Data,Wind), (Wind > 0, Wind =< 19, WindIntensity = 'weak'; Wind > 19, Wind =< 39, WindIntensity = 'moderate'; Wind > 39, Wind =< 59, WindIntensity = 'strong'; Wind > 59, Wind =< 74, WindIntensity = 'gale'; Wind > 74, Wind =< 89, WindIntensity = 'strong gale'; Wind >= 90, WindIntensity = 'storm'; Wind = 0.0, WindIntensity = 'unknown')")
     
     #traffico
     prolog.assertz("traffic_volume(accident(ID), Volume) :- has_Traffic(accident(ID), traffic(TrafficID)), volume(traffic(TrafficID), Vol), (Vol < 100, Volume = 'light'; Vol > 500, Volume = 'heavy'; Vol >= 100, Vol =< 500, Volume = 'medium')")
     prolog.assertz("volume_sum_same_location(accident(ID), TotalVolume) :- findall(Vol, (accidents_same_borough(accident(ID), accident(ID1)), accidents_same_street(accident(ID), accident(ID1)), borough(accident(ID1), Borough), street_name(accident(ID1), Street), has_Traffic(accident(ID1), traffic(TrafficID)), volume(traffic(TrafficID), Vol)), Volumes), sum_list(Volumes, TotalVolume)")
-    prolog.assertz("average_volume_same_location(accident(ID), AvgVolume) :- num_of_accidents_on_street(accident(ID), NumAccidents), (NumAccidents = 'null' -> AvgVolume = 'null'; volume_sum_same_location(accident(ID), TotalVolume), AvgVolume is TotalVolume / NumAccidents)")
+    prolog.assertz("average_volume_same_location(accident(ID), AvgVolume) :- num_of_accidents_on_street(accident(ID), NumAccidents), (NumAccidents = 'unknown' -> AvgVolume = 'unknown'; volume_sum_same_location(accident(ID), TotalVolume), AvgVolume is TotalVolume / NumAccidents)")
 
     #incidente senza feriti e morti
     prolog.assertz("is_not_dangerous(accident(ID)) :- severity(accident(ID), 'minor')")
