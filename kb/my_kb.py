@@ -15,7 +15,7 @@ def assert_clauses_facts(kb):
 def create_kb() -> Prolog:
     prolog = Prolog()
 
-    prolog.consult("data/facts.pl")
+    prolog.consult("kb/facts.pl")
     #assert_clauses_facts(kb=prolog)
     kb=prolog
 
@@ -112,5 +112,5 @@ def produce_working_dataset(kb: Prolog, path: str, final=False):
 
 
 knowledge_base = create_kb()
-produce_working_dataset(knowledge_base, "working_dataset.csv")
+produce_working_dataset(knowledge_base, "kb/generated_dataset.csv")
 #produce_working_dataset(knowledge_base, "working_dataset_final.csv", final=True)

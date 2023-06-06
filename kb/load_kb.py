@@ -6,7 +6,7 @@ def load_data_in_kb(accidents: pd.DataFrame, traffic: pd.DataFrame, weather: pd.
     prolog_file = None
 
     if kb is None:
-        prolog_file = open("data/facts.pl", "w")
+        prolog_file = open("kb/facts.pl", "w")
         action = lambda fact_list: assert_all_in_file(fact_list, prolog_file)
     else:
         action = lambda fact_list: assert_all(fact_list, kb)
