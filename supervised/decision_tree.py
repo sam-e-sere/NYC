@@ -51,6 +51,8 @@ for crit in {"gini", "entropy", "log_loss"}:
 
     for i in range(3, 26):
         clf = DecisionTreeClassifier(max_depth=i, criterion=crit, random_state=0)
+        clf.fit(X_train, y_train)
+        y_pred = clf.predict(X_test)
         scoring = {'accuracy': 'accuracy', 'precision': 'precision', 'recall': 'recall', 'f1': 'f1'}
         cv_results = cross_validate(clf, X, y, cv=10, scoring=scoring, return_train_score=True)
         mean_train_score.append(np.mean(cv_results['train_accuracy']))
@@ -94,12 +96,12 @@ print("Recall del modello:", recall)
 f1_score = f1_score(y_test, y_pred)
 print("F1-score del modello:", f1_score)
 """
-y_pred = clf.predict(X_test)
+
 # Visualizzazione delle feature più importanti
 importances = clf.feature_importances_
 indices = np.argsort(importances)[::-1]
 print("Feature ranking:")
-for f in range(X.shape[1]):
+for f in range(0, 4):
     print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
 
 # Plotting dell'importanza delle feature
