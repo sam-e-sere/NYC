@@ -27,7 +27,8 @@ def load_data_in_kb(accidents: pd.DataFrame, traffic: pd.DataFrame, weather: pd.
                  f"location({collision_id},{row['LATITUDE']}, {row['LONGITUDE']})",
                  f"street_name({collision_id},'{row['TRAFFIC STREET']}')",
                  f"num_injured({collision_id},{row['NUMBER OF PERSONS INJURED']})",
-                 f"num_killed({collision_id},{row['NUMBER OF PERSONS KILLED']})"]  # due to initial number
+                 f"num_killed({collision_id},{row['NUMBER OF PERSONS KILLED']})",
+                 f"day_of_week({collision_id},'{row['DAY OF WEEK']}')"]  # due to initial number
                 
         # individua il traffico corrispondente all'incidente
         traffic_row= traffic.loc[(traffic['Y'] == row['Y']) &

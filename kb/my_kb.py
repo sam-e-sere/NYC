@@ -44,10 +44,6 @@ def create_kb() -> Prolog:
     prolog.assertz("volume_sum_same_location(accident(ID), TotalVolume) :- findall(Vol, (accidents_same_borough(accident(ID), accident(ID1)), accidents_same_street(accident(ID), accident(ID1)), borough(accident(ID1), Borough), street_name(accident(ID1), Street), has_Traffic(accident(ID1), traffic(TrafficID)), volume(traffic(TrafficID), Vol)), Volumes), sum_list(Volumes, TotalVolume)")
     prolog.assertz("average_volume_same_location(accident(ID), AvgVolume) :- num_of_accidents_on_street(accident(ID), NumAccidents), (NumAccidents = 'unknown' -> AvgVolume = 'unknown'; volume_sum_same_location(accident(ID), TotalVolume), AvgVolume is TotalVolume / NumAccidents)")
 
-    #prolog.assertz(":- use_module(library(date_time))")
-    prolog.assertz("day_of_week(accident(ID), DayOfWeek) :- accident_date(accident(ID),Data), day_of_the_week(Data, Day), nth0(Day, ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], DayOfWeek)")
-    #prolog.assertz("day_of_week(accident(ID), DayOfWeek) :- accident_date(accident(ID),Data), parseTime('%Y,%m,%d', Data, DateTime), date_time_value(weekday, DateTime, WeekdayAtom), atom_string(WeekdayAtom, DayOfWeek)")
-
     #incidente senza feriti e morti
     prolog.assertz("is_not_dangerous(accident(ID)) :- severity(accident(ID), 'minor')")
 
@@ -62,10 +58,6 @@ def calculate_features(kb, accident_id, final=False) -> dict:
 
     accident_id = f"accident({accident_id})"
 
-    query = f"day_of_week(accident({accident_id}), DayOfWeek)"
-    print(query)
-
-    features_dict["DAY_OF_WEEK"] = list(kb.query(f"day_of_week({accident_id}, DayOfWeek)"))[0]["DayOfWeek"]
     features_dict["NUM_ACCIDENTS_BOROUGH"] = list(kb.query(f"num_of_accidents_in_borough({accident_id}, Count)"))[0]["Count"]
     features_dict["NUM_ACCIDENTS_ON_STREET"] = list(kb.query(f"num_of_accidents_on_street({accident_id}, Count)"))[0]["Count"]
     features_dict["TIME_OF_DAY"] = list(kb.query(f"time_of_day({accident_id}, TimeOfDay)"))[0]["TimeOfDay"]

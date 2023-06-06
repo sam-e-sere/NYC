@@ -12,8 +12,8 @@ df2 = pd.read_csv("kb/generated_dataset.csv")
 data = pd.merge(df1, df2, on="COLLISION_ID")
 
 # Selezionare le feature e la variabile target
-categorical_features = ["BOROUGH", "TRAFFIC STREET", "TIME_OF_DAY", "TEMPERATURE", "RAIN_INTENSITY", "WIND_INTENSITY", "TRAFFIC_VOLUME"]
-numeric_features = ["M", "D", "HH", "CLOUDCOVER", "AVERAGE_VOLUME"]
+categorical_features = ["BOROUGH", "TRAFFIC STREET", "TIME_OF_DAY", "TEMPERATURE", "RAIN_INTENSITY", "WIND_INTENSITY", "TRAFFIC_VOLUME", "DAY OF WEEK"]
+numeric_features = ["M", "CLOUDCOVER", "AVERAGE_VOLUME"]
 target = "IS_NOT_DANGEROUS"
 
 X = data[categorical_features + numeric_features]

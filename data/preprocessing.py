@@ -1,3 +1,4 @@
+from datetime import datetime
 import pandas as pd
 from shapely.wkt import loads
 from knn import borough_prediction
@@ -233,11 +234,38 @@ def union_dataset():
 
 
 
+def day_of_week():
+
+    # Carica il tuo dataset CSV in un dataframe Pandas
+    df = pd.read_csv("data/Selected Accidents.csv")  # Aggiorna il percorso al tuo dataset CSV
+
+    # Per ogni riga nel dataframe
+    for index, row in df.iterrows():
+        # Estrai le informazioni sulla data dalle colonne Y, M e D
+        year, month, day = row["Y"], row["M"], row["D"]
+        
+        # Costruisci la stringa data nel formato "YYYY-MM-DD"
+        date_str = f"{year:04d}-{month:02d}-{day:02d}"
+        
+        # Converti la stringa data in un oggetto datetime
+        date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+        
+        # Ottieni il giorno della settimana dalla data
+        day_of_week = date_obj.strftime("%A")
+        
+        # Aggiungi l'informazione del giorno della settimana al dataframe
+        df.loc[index, "DAY OF WEEK"] = day_of_week
+
+    # Salva il dataframe con l'informazione aggiuntiva sul giorno della settimana in un nuovo file CSV
+    df.to_csv("data/Selected Accidents.csv", index=False, mode = 'w')  # Aggiorna il percorso al tuo nuovo file CSV
+
 def main():
     #extract_weather()
     #extract_accidents()
     #extract_traffic()
     #borough_prediction()
-    union_dataset()
+    #union_dataset()
+    day_of_week()
+
 
 main()
