@@ -3,10 +3,14 @@ import numpy as np
 import pandas as pd
 from decision_tree import decisionTree
 from random_forest import randomForest
+from logistic_regression import logisticRegression
 
 def printFeatureRanking(clf, X):
     # Visualizzazione delle feature più importanti
-    importances = clf.feature_importances_
+    if 'LogisticRegression' in clf.__class__.__name__:
+        importances = np.abs(clf.coef_)[0]
+    else:
+        importances = clf.feature_importances_
     indices = np.argsort(importances)[::-1]
     print("Feature ranking:")
     for f in range(0, 4):
@@ -33,8 +37,12 @@ X = data[categorical_features + numeric_features]
 
 print("---DECISION TREE---")
 clf = decisionTree(data, categorical_features, numeric_features, target)
-printFeatureRanking(clf, X)
+print(clf)
 
 print("---RANDOM FOREST---")
 clf = randomForest(data, categorical_features, numeric_features, target)
+printFeatureRanking(clf, X)
+
+print("---LOGISTIC REGRESSION---")
+clf = logisticRegression(data, categorical_features, numeric_features, target)
 printFeatureRanking(clf, X)
