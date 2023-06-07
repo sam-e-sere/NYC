@@ -52,6 +52,7 @@ def logisticRegression(data, categorical_features, numeric_features, target):
     plt.xlabel("C")
     plt.ylabel("Score")
     plt.legend()
+    #plt.ylim([0.2, 1.0])
     plt.show()
 
     print(f"Media test acc: {np.mean(mean_test_score)}")

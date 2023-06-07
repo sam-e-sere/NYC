@@ -18,7 +18,7 @@ def adaBoost(data, categorical_features, numeric_features, target):
     # Divisione del dataset in training set e test set
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
-    n_estimators_range = [10, 50, 100, 150, 200]
+    n_estimators_range = [10, 50, 100, 150]
 
     mean_train_score = []
     mean_test_score = []
@@ -44,6 +44,7 @@ def adaBoost(data, categorical_features, numeric_features, target):
     plt.xlabel("Number of Trees")
     plt.ylabel("Score")
     plt.legend()
+    plt.ylim([0.2, 1.0])
     plt.show()
 
     print(f"Media test acc: {np.mean(mean_test_score)}")

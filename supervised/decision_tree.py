@@ -45,6 +45,7 @@ def decisionTree(data, categorical_features, numeric_features, target):
     plt.xlabel("Tree Depth")
     plt.ylabel("Score")
     plt.legend()
+    plt.ylim([0.2, 1.0])
     #plt.savefig(f"{directory}tree_{crit}.png")
     plt.show()
 
