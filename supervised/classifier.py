@@ -34,28 +34,29 @@ data = pd.merge(df1, df2, on="COLLISION_ID")
 
 # Selezionare le feature e la variabile target
 categorical_features = ["BOROUGH", "TRAFFIC STREET", "TIME_OF_DAY", "TEMPERATURE", "RAIN_INTENSITY", "WIND_INTENSITY", "TRAFFIC_VOLUME", "DAY OF WEEK"]
-numeric_features = ["M", "CLOUDCOVER", "AVERAGE_VOLUME"]
+numeric_features = ["M", "CLOUDCOVER", "AVERAGE_VOLUME", 'NUM_ACCIDENTS_BOROUGH', 'NUM_ACCIDENTS_ON_STREET']
 target = "IS_NOT_DANGEROUS"
 X = data[categorical_features + numeric_features]
 
 print("---DECISION TREE---")
 clf = decisionTree(data, categorical_features, numeric_features, target)
+printFeatureRanking(clf, X)
 
 print("---RANDOM FOREST---")
 clf = randomForest(data, categorical_features, numeric_features, target)
-#printFeatureRanking(clf, X)
+printFeatureRanking(clf, X)
 
 print("---LOGISTIC REGRESSION---")
 clf = logisticRegression(data, categorical_features, numeric_features, target)
-#printFeatureRanking(clf, X)
+printFeatureRanking(clf, X)
 
 print("---ADA BOOST---")
 clf = adaBoost(data, categorical_features, numeric_features, target)
-#printFeatureRanking(clf, X)
+printFeatureRanking(clf, X)
 
 print("---GRADIENT BOOST---")
 clf = gradientBoost(data, categorical_features, numeric_features, target)
-#printFeatureRanking(clf, X)
+printFeatureRanking(clf, X)
 
 print("---NAIVE BAYES CATEGORICAL---")
 clf = naiveBayesCategorical(data, categorical_features, target)

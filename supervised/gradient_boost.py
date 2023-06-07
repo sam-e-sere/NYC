@@ -43,7 +43,7 @@ def gradientBoost(data, categorical_features, numeric_features, target):
     plt.ylabel("Score")
     plt.legend()
     plt.ylim([0.2, 1.0])
-    plt.show()
+    #plt.show()
 
     print(f"Media test acc: {np.mean(mean_test_score)}")
     print(f"Media test prec: {np.mean(mean_test_p)}")

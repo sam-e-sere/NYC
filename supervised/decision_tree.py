@@ -47,7 +47,7 @@ def decisionTree(data, categorical_features, numeric_features, target):
     plt.legend()
     plt.ylim([0.2, 1.0])
     #plt.savefig(f"{directory}tree_{crit}.png")
-    plt.show()
+    #plt.show()
 
     print(f"Media test acc: {np.mean(mean_test_score)}")
     print(f"Media test prec: {np.mean(mean_test_p)}")
