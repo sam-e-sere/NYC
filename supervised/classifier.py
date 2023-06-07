@@ -5,6 +5,7 @@ from decision_tree import decisionTree
 from random_forest import randomForest
 from logistic_regression import logisticRegression
 from ada_boost import adaBoost
+from gradient_boost import gradientBoost
 
 def printFeatureRanking(clf, X):
     # Visualizzazione delle feature più importanti
@@ -36,7 +37,7 @@ numeric_features = ["M", "CLOUDCOVER", "AVERAGE_VOLUME"]
 target = "IS_NOT_DANGEROUS"
 X = data[categorical_features + numeric_features]
 
-
+"""
 print("---DECISION TREE---")
 clf = decisionTree(data, categorical_features, numeric_features, target)
 
@@ -47,7 +48,12 @@ printFeatureRanking(clf, X)
 print("---LOGISTIC REGRESSION---")
 clf = logisticRegression(data, categorical_features, numeric_features, target)
 printFeatureRanking(clf, X)
-
+"""
 print("---ADA BOOST---")
 clf = adaBoost(data, categorical_features, numeric_features, target)
+printFeatureRanking(clf, X)
+
+
+print("---GRADIENT BOOST---")
+clf = gradientBoost(data, categorical_features, numeric_features, target)
 printFeatureRanking(clf, X)
