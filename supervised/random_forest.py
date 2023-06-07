@@ -24,6 +24,9 @@ def randomForest(data, categorical_features, numeric_features, target):
     mean_test_score_depth = []
     mean_train_score_trees = []
     mean_test_score_trees = []
+    mean_test_p = []
+    mean_test_r = []
+    mean_test_f = []
 
     for i in max_depth_range:
         clf = RandomForestClassifier(n_estimators=100, max_depth=i, criterion="entropy", random_state=0)
@@ -33,6 +36,9 @@ def randomForest(data, categorical_features, numeric_features, target):
         cv_results = cross_validate(clf, X, y, cv=5, scoring=scoring, return_train_score=True)
         mean_train_score_depth.append(np.mean(cv_results['train_accuracy']))
         mean_test_score_depth.append(np.mean(cv_results['test_accuracy']))
+        mean_test_p.append(np.mean(cv_results['test_precision']))
+        mean_test_r.append(np.mean(cv_results['test_recall']))
+        mean_test_f.append(np.mean(cv_results['test_f1']))
 
     for i in n_estimators_range:
         clf = RandomForestClassifier(n_estimators=i, max_depth=10, criterion="entropy", random_state=0)
@@ -42,6 +48,7 @@ def randomForest(data, categorical_features, numeric_features, target):
         cv_results = cross_validate(clf, X, y, cv=5, scoring=scoring, return_train_score=True)
         mean_train_score_trees.append(np.mean(cv_results['train_accuracy']))
         mean_test_score_trees.append(np.mean(cv_results['test_accuracy']))
+        
 
     plt.figure(figsize=(8, 6))
     plt.plot(max_depth_range, mean_train_score_depth, label="Training score")
@@ -62,5 +69,8 @@ def randomForest(data, categorical_features, numeric_features, target):
     plt.show()
 
     print(f"Media test acc: {np.mean(mean_test_score_depth)}")
+    print(f"Media test prec: {np.mean(mean_test_p)}")
+    print(f"Media test rec: {np.mean(mean_test_r)}")
+    print(f"Media test f-measure: {np.mean(mean_test_f)}")
 
     return clf
