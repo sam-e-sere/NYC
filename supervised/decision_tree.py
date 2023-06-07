@@ -65,7 +65,7 @@ importances = clf.feature_importances_
 indices = np.argsort(importances)[::-1]
 print("Feature ranking:")
 for f in range(0, 4):
-    print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
+    print("%d. %s (%f)" % (f+1, X.columns[indices[f]], importances[indices[f]]))
 
 # Plotting dell'importanza delle feature
 plt.figure()

@@ -27,7 +27,7 @@ def create_kb() -> Prolog:
     prolog.assertz("num_of_accidents_on_street(accident(ID), Count) :- street_name(accident(ID), OnStreet), borough(accident(ID), Borough), (OnStreet = 'unknown' -> Count = 'unknown' ; OnStreet \\= 'unknown', findall(StreetID, (street_name(accident(StreetID), OnStreet), borough(accident(StreetID), Borough)), StreetIDs), sort(StreetIDs, UniqueStreetIDs), length(UniqueStreetIDs, Count))")
    
     # conteggi sulla data/tempo
-    prolog.assertz("time_of_day(accident(ID), TimeOfDay) :- hour(accident(ID), Hour), (Hour >= 6, Hour < 12, TimeOfDay = 'morning'; Hour >= 12, Hour < 18, TimeOfDay = 'afternoon'; Hour >= 18, Hour < 24, TimeOfDay = 'evening'; Hour >= 0, Hour < 6, TimeOfDay = 'night')")
+    prolog.assertz("time_of_day(accident(ID), TimeOfDay) :- hour(accident(ID), Hour), (Hour >= 4, Hour < 7, TimeOfDay = 'dawn'; Hour >= 7, Hour < 10, TimeOfDay = 'early morning'; Hour >= 10, Hour < 12, TimeOfDay = 'late morning'; Hour >= 12, Hour < 15, TimeOfDay = 'early afternoon'; Hour >= 15, Hour < 18, TimeOfDay = 'late afternoon'; Hour >= 18, Hour < 20, TimeOfDay = 'early evening'; Hour >= 20, Hour < 22, TimeOfDay = 'late evening'; Hour >= 22, Hour < 24, TimeOfDay = 'early night'; Hour >= 0, Hour < 4, TimeOfDay = 'late night')")
     
     #gravità (0 feriti e 0 morti = lieve, 1/+ feriti e 0 morti = moderato, 0/+ feriti e 1/+ morti = grave)
     prolog.assertz("severity(accident(ID), Severity) :- num_injured(accident(ID), NumInjured), num_killed(accident(ID), NumKilled), (NumInjured = 0, NumKilled = 0, Severity = 'minor'; NumInjured >= 1, NumKilled = 0, Severity = 'moderate'; NumInjured >= 0, NumKilled > 0, Severity = 'major')")
