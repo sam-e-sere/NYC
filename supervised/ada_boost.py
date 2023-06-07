@@ -27,12 +27,12 @@ def adaBoost(data, categorical_features, numeric_features, target):
     mean_test_f = []
 
     for i in n_estimators_range:
-        dt = DecisionTreeClassifier(max_depth=10)
-        clf = AdaBoostClassifier(estimator=dt, n_estimators=i, random_state=0)
+        dt = DecisionTreeClassifier(max_depth=3) 
+        clf = AdaBoostClassifier(estimator=dt, n_estimators=i, learning_rate=0.05, random_state=0)
         clf.fit(X_train, y_train)
         y_pred = clf.predict(X_test)
         scoring = {'accuracy': 'accuracy', 'precision': 'precision', 'recall': 'recall', 'f1': 'f1'}
-        cv_results = cross_validate(clf, X, y, cv=5, scoring=scoring, return_train_score=True)
+        cv_results = cross_validate(clf, X, y, cv=10, scoring=scoring, return_train_score=True)
         mean_train_score.append(np.mean(cv_results['train_accuracy']))
         mean_test_score.append(np.mean(cv_results['test_accuracy']))
         mean_test_p.append(np.mean(cv_results['test_precision']))
