@@ -6,6 +6,7 @@ from random_forest import randomForest
 from logistic_regression import logisticRegression
 from ada_boost import adaBoost
 from gradient_boost import gradientBoost
+from naiveBayesCategorico import naiveBayesCategorical
 
 def printFeatureRanking(clf, X):
     # Visualizzazione delle feature più importanti
@@ -48,12 +49,14 @@ printFeatureRanking(clf, X)
 print("---LOGISTIC REGRESSION---")
 clf = logisticRegression(data, categorical_features, numeric_features, target)
 printFeatureRanking(clf, X)
-"""
+
 print("---ADA BOOST---")
 clf = adaBoost(data, categorical_features, numeric_features, target)
 printFeatureRanking(clf, X)
-
-
+"""
 print("---GRADIENT BOOST---")
 clf = gradientBoost(data, categorical_features, numeric_features, target)
 printFeatureRanking(clf, X)
+
+print("---NAIVE BAYES CATEGORICAL---")
+clf = naiveBayesCategorical(data, categorical_features, target)
