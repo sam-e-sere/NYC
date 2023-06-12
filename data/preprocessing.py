@@ -50,13 +50,11 @@ def extract_weather():
     # riordina le colonne in base all'ordine desiderato
     weather = weather.reindex(columns=['Y', 'M', 'D', 'HH'] + list(weather.columns[:-4]))
 
-    # seleziona solo le righe con l'anno 2020 
+    # seleziona solo le righe con anno 2019 e 2020 
     weather = weather.loc[(weather['Y'] == 2019) | (weather['Y'] == 2020)]
 
     # rimuovi le tre colonne che riguardano il cloudcover -> è utile solo cloudcover_low
     weather = weather.drop(['cloudcover (%)','cloudcover_mid (%)','cloudcover_high (%)'], axis=1)
-
-
 
     # visualizza il dataframe risultante
     weather.to_csv("data/working_dataset/New NYC Weather.csv", index=False, mode='w')
@@ -83,14 +81,14 @@ def extract_accidents():
         accidents.at[index, 'D'] = day
 
 
-    # rimuovi la colonna "time" originale
+    # rimuovi la colonna "crash date" originale
     accidents = accidents.drop('CRASH DATE', axis=1)
 
     # crea le nuove colonne vuote
     accidents['HH'] = ''
     accidents['MM'] = ''
 
-    # itera su ogni riga del dataframe e separa la data
+    # itera su ogni riga del dataframe e separa il crash time
     for index, row in accidents.iterrows():
         hour, minutes = row['CRASH TIME'].split(':')
         
@@ -98,7 +96,7 @@ def extract_accidents():
         accidents.at[index, 'HH'] = hour
         accidents.at[index, 'MM'] = minutes
 
-    # rimuovi la colonna "time" originale
+    # rimuovi la colonna "crash time" originale
     accidents = accidents.drop('CRASH TIME', axis=1)
     
     # rimuovi le colonne non necessarie
@@ -114,37 +112,10 @@ def extract_accidents():
     accidents.to_csv("data/working_dataset/New NYC Accidents.csv", index=False, mode='w')
 
 
-#Estrazione delle informazioni necessarie del file 'NYC Accidents'
+#Estrazione delle informazioni necessarie del file 'NYC Traffic'
 def extract_traffic():
     # Caricamento del dataset
     traffic = pd.read_csv("data/old dataset/NYC Traffic.csv")
-
-    """
-    # estrai le coordinate x e y dalla colonna WktGeom e crea una serie geografica
-    geometry = traffic['WktGeom'].apply(lambda x: loads(x))
-    geo_series = pd.Series(geometry)
-
-    # converte le coordinate geografiche in latitudine e longitudine
-    traffic['X'] = geo_series.apply(lambda x: x.x)
-    traffic['Y'] = geo_series.apply(lambda x: x.y)
-
-    
-    # imposta la proiezione cartografica utlizzata nel dataset
-    crs = 'EPSG:2263'  #proiezione cartografica UTM
-
-    # crea un oggetto Transformer per la conversione delle coordinate
-    transformer = pyproj.Transformer.from_crs(crs, 'EPSG:4326', always_xy=True)
-
-    # converte le coordinate in latitudine e longitudine
-    lon, lat = transformer.transform(traffic['X'], traffic['Y'])
-
-    # aggiungi le colonne di latitudine e longitudine al dataset
-    traffic['LATITUDE'] = lat
-    traffic['LONGITUDE'] = lon
-
-    # rimuovi le colonne non necessarie
-    traffic = traffic.drop(['WktGeom','X', 'Y'], axis=1)
-    """
 
     # crea un nuovo DataFrame con la media dei valori di "Vol" per ogni gruppo di righe duplicate
     traffic = traffic.groupby(['Boro', 'Yr', 'M', 'D', 'HH', 'MM', 'street'], as_index=False)['Vol'].mean()
