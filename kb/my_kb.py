@@ -1,5 +1,5 @@
 import time
-
+from load_kb import create_prolog_kb 
 import pandas as pd
 from pyswip import Prolog
 
@@ -111,6 +111,9 @@ def produce_working_dataset(kb: Prolog, path: str, final=False):
     print("Total time: ", end-start)
 
 
-knowledge_base = create_kb()
-produce_working_dataset(knowledge_base, "kb/generated_dataset.csv")
-#produce_working_dataset(knowledge_base, "working_dataset_final.csv", final=True)
+def main():
+    create_prolog_kb()
+    knowledge_base = create_kb()
+    produce_working_dataset(knowledge_base, "kb/generated_dataset.csv")
+
+main()

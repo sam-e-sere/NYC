@@ -260,11 +260,11 @@ def day_of_week():
     df.to_csv("data/Selected Accidents.csv", index=False, mode = 'w')  # Aggiorna il percorso al tuo nuovo file CSV
 
 def main():
-    #extract_weather()
-    #extract_accidents()
-    #extract_traffic()
-    #borough_prediction()
-    #union_dataset()
+    extract_weather()
+    extract_accidents()
+    extract_traffic()
+    borough_prediction()
+    union_dataset()
     day_of_week()
 
 

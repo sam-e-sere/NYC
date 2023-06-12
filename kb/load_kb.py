@@ -114,10 +114,3 @@ def datetime_to_prolog_fact(datetime_str: str) -> str:
 def date_time_from_dataset(datetime_str: str) -> datetime:
     return datetime.datetime.strptime(datetime_str, '%Y,%m,%d,%H,%M,%S')
 
-
-def main():
-    create_prolog_kb()
-
-
-main()
-
