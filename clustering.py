@@ -2,6 +2,7 @@ from matplotlib import pyplot as plt
 import matplotlib
 import pandas as pd
 from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import OrdinalEncoder
 
 
@@ -45,13 +46,6 @@ kmeans.fit(X)
 # Aggiungi i centroidi del clustering al dataset
 data["Cluster"] = kmeans.predict(X)
 
-
-# Visualizza i risultati del clustering
-print(data.groupby("Cluster")[["NUMBER OF PERSONS INJURED", "NUMBER OF PERSONS KILLED", "CLOUDCOVER", "AVERAGE_VOLUME"]].mean())
-
-data.to_csv("prova.csv", index=False, mode = 'w')
-
-
 # Seleziona le feature per il grafico scatter
 feature1 = "LONGITUDE"
 feature2 = "LATITUDE"
@@ -75,4 +69,8 @@ plt.legend(title="Cluster", loc="upper right", markerscale=1, fontsize=10)
 
 plt.show()
 
-#FARE LE VALUTAZIONI
+# Calcola l'indice di silhouette per il clustering
+silhouette_avg = silhouette_score(X, kmeans.labels_)
+
+# Stampa l'indice di silhouette medio
+print("Indice di silhouette medio:", silhouette_avg)
