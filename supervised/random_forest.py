@@ -49,22 +49,28 @@ def randomForest(data, categorical_features, numeric_features, target):
         
 
     plt.figure(figsize=(8, 6))
+    plt.title('Train and Test score')
     plt.plot(max_depth_range, mean_train_score_depth, label="Training score")
     plt.plot(max_depth_range, mean_test_score_depth, label="Test score")
     plt.xlabel("Tree Depth")
     plt.ylabel("Score")
     plt.legend()
     plt.ylim([0.2, 1.0])
-    #plt.show()
-
+    # Specifica il percorso completo del file in cui salvare il grafico 
+    path = "images/rf_score_depth.png" 
+    plt.savefig(path)
+    
     plt.figure(figsize=(8, 6))
+    plt.title('Train and Test score')
     plt.plot(n_estimators_range, mean_train_score_trees, label="Training score")
     plt.plot(n_estimators_range, mean_test_score_trees, label="Test score")
     plt.xlabel("Number of Trees")
     plt.ylabel("Score")
     plt.legend()
     plt.ylim([0.2, 1.0])
-   # plt.show()
+    # Specifica il percorso completo del file in cui salvare il grafico 
+    path = "images/rf_score_number_of_trees.png" 
+    plt.savefig(path)
 
     print(f"Media test acc: {np.mean(mean_test_score_depth)}")
     print(f"Media test prec: {np.mean(mean_test_p)}")

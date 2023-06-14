@@ -5,8 +5,6 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import OrdinalEncoder
 
-
-
 # Carica i dati sui due dataset e utilizza il dataset su cui è stato effettuato il merge
 df1 = pd.read_csv("data/Selected Accidents.csv")
 df2 = pd.read_csv("kb/generated_dataset.csv")
@@ -33,7 +31,9 @@ plt.plot(range(1, 11), inertias)
 plt.title('Curva di elbow')
 plt.xlabel('Numero di cluster')
 plt.ylabel('Inerzia')
-plt.show()
+# Specifica il percorso completo del file in cui salvare il grafico 
+path = "images/elbow.png" 
+plt.savefig(path)
 
 # Esegui il clustering con l'algoritmo k-means
 kmeans = KMeans(n_clusters=3, random_state=0, n_init=10)
@@ -47,10 +47,12 @@ data["Cluster"] = kmeans.predict(X)
 feature1 = "LONGITUDE"
 feature2 = "LATITUDE"
 
-#il grafico scatter dovrebbe mostrare eventuali aree della città dove si verificano incidenti stradali con caratteristiche simili, come ad esempio un alto numero di persone ferite o uccise.
+#il grafico scatter dovrebbe mostrare eventuali aree della città dove si verificano incidenti stradali con caratteristiche simili, 
+# come ad esempio un alto numero di persone ferite o uccise.
 
 # Crea il grafico scatter colorato in base all'etichetta di cluster
 cmap = matplotlib.cm.get_cmap('viridis', len(data['Cluster'].unique()))
+plt.title('Clustering')
 plt.scatter(data[feature1], data[feature2], c=data['Cluster'], cmap=cmap)
 plt.xlabel(feature1)
 plt.ylabel(feature2)
@@ -58,13 +60,16 @@ plt.ylabel(feature2)
 plt.xlim(-74.3, -73.6)
 plt.ylim(40.4, 40.99)
 
+
 # Aggiungi la legenda dei cluster
 cluster_labels = sorted(data['Cluster'].unique())
 for label in cluster_labels:
     plt.scatter([], [], color=cmap(label), alpha=0.5, label='Cluster {}'.format(label))
 plt.legend(title="Cluster", loc="upper right", markerscale=1, fontsize=10)
 
-plt.show()
+# Specifica il percorso completo del file in cui salvare il grafico 
+path = "images/clustering.png" 
+plt.savefig(path)
 
 # Calcola l'indice di silhouette (valutazione) per il clustering
 silhouette_avg = silhouette_score(X, kmeans.labels_)
