@@ -48,10 +48,6 @@ print("---RANDOM FOREST---")
 clf = randomForest(data, categorical_features, numeric_features, target)
 printFeatureRanking(clf, X)
 """
-print("---LOGISTIC REGRESSION---")
-clf = logisticRegression(data, categorical_features, numeric_features, target)
-printFeatureRanking(clf, X)
-
 
 print("---ADA BOOST---")
 clf = adaBoost(data, categorical_features, numeric_features, target)
