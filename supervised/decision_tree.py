@@ -27,18 +27,16 @@ def decisionTree(data, categorical_features, numeric_features, target):
     mean_test_r = []
     mean_test_f = []
 
-    #dai risultati abbiamo deciso di utilizzare entropy
     for i in range(3, 26):
         clf = DecisionTreeClassifier(max_depth=i, criterion='entropy', random_state=0)
         clf.fit(X_train, y_train)
-        y_pred = clf.predict(X_test)
-        scoring = {'accuracy': 'accuracy', 'precision': 'precision', 'recall': 'recall', 'f1': 'f1'}
-        cv_results = cross_validate(clf, X, y, cv=5, scoring=scoring, return_train_score=True)
-        mean_train_score.append(np.mean(cv_results['train_accuracy']))
-        mean_test_score.append(np.mean(cv_results['test_accuracy']))
-        mean_test_p.append(np.mean(cv_results['test_precision']))
-        mean_test_r.append(np.mean(cv_results['test_recall']))
-        mean_test_f.append(np.mean(cv_results['test_f1']))
+        y_train_pred = clf.predict(X_train)
+        y_test_pred = clf.predict(X_test)
+        mean_train_score.append(accuracy_score(y_train, y_train_pred))
+        mean_test_score.append(accuracy_score(y_test, y_test_pred))
+        mean_test_p.append(precision_score(y_test, y_test_pred, average='macro'))
+        mean_test_r.append(recall_score(y_test, y_test_pred, average='macro'))
+        mean_test_f.append(f1_score(y_test, y_test_pred, average='macro'))
 
     plt.plot(range(3, 26), mean_train_score, label="Training score")
     plt.plot(range(3, 26), mean_test_score, label="Test score")
@@ -47,7 +45,7 @@ def decisionTree(data, categorical_features, numeric_features, target):
     plt.legend()
     plt.ylim([0.2, 1.0])
     #plt.savefig(f"{directory}tree_{crit}.png")
-    #plt.show()
+    plt.show()
 
     print(f"Media test acc: {np.mean(mean_test_score)}")
     print(f"Media test prec: {np.mean(mean_test_p)}")

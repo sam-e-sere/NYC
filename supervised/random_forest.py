@@ -27,27 +27,25 @@ def randomForest(data, categorical_features, numeric_features, target):
     mean_test_p = []
     mean_test_r = []
     mean_test_f = []
-
+    
     for i in max_depth_range:
         clf = RandomForestClassifier(n_estimators=100, max_depth=i, criterion="entropy", random_state=0)
         clf.fit(X_train, y_train)
-        y_pred = clf.predict(X_test)
-        scoring = {'accuracy': 'accuracy', 'precision': 'precision', 'recall': 'recall', 'f1': 'f1'}
-        cv_results = cross_validate(clf, X, y, cv=5, scoring=scoring, return_train_score=True)
-        mean_train_score_depth.append(np.mean(cv_results['train_accuracy']))
-        mean_test_score_depth.append(np.mean(cv_results['test_accuracy']))
-        mean_test_p.append(np.mean(cv_results['test_precision']))
-        mean_test_r.append(np.mean(cv_results['test_recall']))
-        mean_test_f.append(np.mean(cv_results['test_f1']))
-
+        y_train_pred = clf.predict(X_train)
+        y_test_pred = clf.predict(X_test)
+        mean_train_score_depth.append(accuracy_score(y_train, y_train_pred))
+        mean_test_score_depth.append(accuracy_score(y_test, y_test_pred))
+        mean_test_p.append(precision_score(y_test, y_test_pred, average='macro', zero_division = 0))
+        mean_test_r.append(recall_score(y_test, y_test_pred, average='macro'))
+        mean_test_f.append(f1_score(y_test, y_test_pred, average='macro'))
+    
     for i in n_estimators_range:
         clf = RandomForestClassifier(n_estimators=i, max_depth=10, criterion="entropy", random_state=0)
         clf.fit(X_train, y_train)
-        y_pred = clf.predict(X_test)
-        scoring = {'accuracy': 'accuracy', 'precision': 'precision', 'recall': 'recall', 'f1': 'f1'}
-        cv_results = cross_validate(clf, X, y, cv=5, scoring=scoring, return_train_score=True)
-        mean_train_score_trees.append(np.mean(cv_results['train_accuracy']))
-        mean_test_score_trees.append(np.mean(cv_results['test_accuracy']))
+        y_train_pred = clf.predict(X_train)
+        y_test_pred = clf.predict(X_test)
+        mean_train_score_trees.append(accuracy_score(y_train, y_train_pred))
+        mean_test_score_trees.append(accuracy_score(y_test, y_test_pred))
         
 
     plt.figure(figsize=(8, 6))

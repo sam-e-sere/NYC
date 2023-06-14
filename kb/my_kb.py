@@ -3,20 +3,10 @@ from load_kb import create_prolog_kb
 import pandas as pd
 from pyswip import Prolog
 
-
-"""
-def assert_clauses_facts(kb):
-    with open("clauses.pl", "r") as loc_file:
-        lines = loc_file.readlines()
-        for line in lines:
-            kb.assertz(line)
-"""
-
 def create_kb() -> Prolog:
     prolog = Prolog()
 
     prolog.consult("kb/facts.pl")
-    #assert_clauses_facts(kb=prolog)
     kb=prolog
 
     # conteggi geografici
@@ -50,7 +40,6 @@ def create_kb() -> Prolog:
     return prolog
 
 
-# suppongo che ci sia già
 def calculate_features(kb, accident_id, final=False) -> dict:
     features_dict = {}
 
@@ -73,15 +62,6 @@ def calculate_features(kb, accident_id, final=False) -> dict:
 
     features_dict["IS_NOT_DANGEROUS"] = query_boolean_result(kb, f"is_not_dangerous({accident_id})")
 
-    """
-    if final:
-        # added after Naive Bayes Categorical results
-        for value in ["vehicle", "private_vehicle", "public_vehicle", "public_place", "parking", "store_pub", "gas_station",
-                      "park", "outside", "street", "sidewalk", "alley", "residential", "apartment", "house", "residence",
-                      "residential_outside"]:
-            features_dict[f"LOCATION_{value}"] = query_boolean_result(kb, f"location_{value}({crime_id})")
-
-    """
     return features_dict
 
 

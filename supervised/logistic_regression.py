@@ -1,8 +1,11 @@
 import pandas as pd
+from sklearn.metrics import accuracy_score
 from sklearn.discriminant_analysis import StandardScaler
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import f1_score, precision_score, recall_score
 from sklearn.model_selection import cross_validate, train_test_split
 from sklearn.preprocessing import OrdinalEncoder
+from sklearn.model_selection import GridSearchCV
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -27,37 +30,35 @@ def logisticRegression(data, categorical_features, numeric_features, target):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
     # Prova diversi valori di C per la regressione logistica
-    C_values = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
-    mean_train_score = []
-    mean_test_score = []
-    mean_test_p = []
-    mean_test_r = []
-    mean_test_f = []
+    param_grid = {'C': [0.001, 0.01, 0.1, 1, 10, 100]}
     
-    for C in C_values:
-        clf = LogisticRegression(C=C, max_iter=1000, random_state=0)
-        clf.fit(X_train, y_train)
-        y_pred = clf.predict(X_test)
-        scoring = {'accuracy': 'accuracy', 'precision': 'precision', 'recall': 'recall', 'f1': 'f1'}
-        cv_results = cross_validate(clf, X, y, cv=5, scoring=scoring, return_train_score=True)
-        mean_train_score.append(np.mean(cv_results['train_accuracy']))
-        mean_test_score.append(np.mean(cv_results['test_accuracy']))
-        mean_test_p.append(np.mean(cv_results['test_precision']))
-        mean_test_r.append(np.mean(cv_results['test_recall']))
-        mean_test_f.append(np.mean(cv_results['test_f1']))
+    clf = LogisticRegression(max_iter=1000, random_state=0)
+    grid_search = GridSearchCV(clf, param_grid, scoring='accuracy', cv=5, return_train_score=True)
+    grid_search.fit(X_train, y_train)
+    
+    best_model = grid_search.best_estimator_
+    
+    y_train_pred = best_model.predict(X_train)
+    y_test_pred = best_model.predict(X_test)
 
-    plt.plot(C_values, mean_train_score, label="Training score")
-    plt.plot(C_values, mean_test_score, label="Test score")
+    mean_train_score = accuracy_score(y_train, y_train_pred)
+    mean_test_score = accuracy_score(y_test, y_test_pred)
+    mean_test_p = precision_score(y_test, y_test_pred, average='macro', zero_division = 0)
+    mean_test_r = recall_score(y_test, y_test_pred, average='macro')
+    mean_test_f = f1_score(y_test, y_test_pred, average='macro')
+
+    plt.plot(param_grid['C'], grid_search.cv_results_['mean_train_score'], label="Training score")
+    plt.plot(param_grid['C'], grid_search.cv_results_['mean_test_score'], label="Test score")
     plt.xscale('log')
     plt.xlabel("C")
     plt.ylabel("Score")
+    plt.title("Accuracy Scores for Different C Values")
     plt.legend()
-    #plt.ylim([0.2, 1.0])
-    #plt.show()
+    plt.show()
 
-    print(f"Media test acc: {np.mean(mean_test_score)}")
-    print(f"Media test prec: {np.mean(mean_test_p)}")
-    print(f"Media test rec: {np.mean(mean_test_r)}")
-    print(f"Media test f-measure: {np.mean(mean_test_f)}")
+    print(f"Media test acc: {mean_test_score}")
+    print(f"Media test prec: {mean_test_p}")
+    print(f"Media test rec: {mean_test_r}")
+    print(f"Media test f-measure: {mean_test_f}")
 
-    return clf
+    return best_model

@@ -19,7 +19,7 @@ def adaBoost(data, categorical_features, numeric_features, target):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
     n_estimators_range = [10, 50, 100, 150]
-
+    
     mean_train_score = []
     mean_test_score = []
     mean_test_p = []
@@ -30,14 +30,13 @@ def adaBoost(data, categorical_features, numeric_features, target):
         dt = DecisionTreeClassifier(max_depth=3) 
         clf = AdaBoostClassifier(estimator=dt, n_estimators=i, learning_rate=0.05, random_state=0)
         clf.fit(X_train, y_train)
-        y_pred = clf.predict(X_test)
-        scoring = {'accuracy': 'accuracy', 'precision': 'precision', 'recall': 'recall', 'f1': 'f1'}
-        cv_results = cross_validate(clf, X, y, cv=10, scoring=scoring, return_train_score=True)
-        mean_train_score.append(np.mean(cv_results['train_accuracy']))
-        mean_test_score.append(np.mean(cv_results['test_accuracy']))
-        mean_test_p.append(np.mean(cv_results['test_precision']))
-        mean_test_r.append(np.mean(cv_results['test_recall']))
-        mean_test_f.append(np.mean(cv_results['test_f1']))
+        y_train_pred = clf.predict(X_train)
+        y_test_pred = clf.predict(X_test)
+        mean_train_score.append(accuracy_score(y_train, y_train_pred))
+        mean_test_score.append(accuracy_score(y_test, y_test_pred))
+        mean_test_p.append(precision_score(y_test, y_test_pred, average='macro'))
+        mean_test_r.append(recall_score(y_test, y_test_pred, average='macro'))
+        mean_test_f.append(f1_score(y_test, y_test_pred, average='macro'))
 
     plt.plot(n_estimators_range, mean_train_score, label="Training score")
     plt.plot(n_estimators_range, mean_test_score, label="Test score")
