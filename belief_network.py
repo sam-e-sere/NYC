@@ -1,4 +1,6 @@
-from pgmpy.models import BayesianModel
+import networkx as nx
+from matplotlib import pyplot as plt
+from pgmpy.models import BayesianNetwork
 from pgmpy.inference import VariableElimination
 from pgmpy.factors.discrete import TabularCPD
 import pandas as pd
@@ -23,7 +25,7 @@ X_encoded = pd.DataFrame(encoder.fit_transform(X[categorical_features]), columns
 X_encoded = pd.concat([X_encoded, X[boolean_features]], axis=1)
 
 # Crea la rete bayesiana
-model = BayesianModel()
+model = BayesianNetwork()
 
 model.add_nodes_from(X_encoded.columns)
 
@@ -65,27 +67,68 @@ for cpd in cpds:
 
 if model.check_model():
     print("rete valida")
+
+    # Creazione del grafo
+    G = nx.DiGraph()
+    G.add_nodes_from(model.nodes())
+    G.add_edges_from(model.edges())
+
+    # Calcolo della posizione dei nodi
+    pos = nx.spring_layout(G, k=1, iterations=50)
+
+    # Disegno del grafo
+    plt.figure(figsize=(8, 6))
+
+    # Disegno del grafo
+    nx.draw(G, with_labels=True, node_color='lightblue', edge_color='grey', font_weight='bold')
+
+    
+
+    # Regola la posizione dei nodi per aggiungere un margine intorno ai nodi
+    x_vals, y_vals = zip(*pos.values())
+    x_max, x_min = max(x_vals), min(x_vals)
+    y_max, y_min = max(y_vals), min(y_vals)
+    x_margin = (x_max - x_min) * 0.2
+    y_margin = (y_max - y_min) * 0.2
+    plt.xlim(x_min - x_margin, x_max + x_margin)
+    plt.ylim(y_min - y_margin, y_max + y_margin)
+
+    # Aggiunge margini a sinistra e a destra
+    x_size = x_max - x_min
+    y_size = y_max - y_min
+    max_size = max(x_size, y_size)
+    left_margin = (max_size - x_size) / 2
+    right_margin = max_size - x_size - left_margin
+    plt.xlim(x_min - left_margin - x_margin, x_max + right_margin + x_margin)
+    
+    # Specifica il percorso completo del file in cui salvare il grafico 
+    path = "images/belief_network.png" 
+    # Salva il grafico nella directory specificata 
+    plt.savefig(path)
+
+    # Effettua l'inferenza per calcolare la probabilità che l'evento "IS_NOT_DANGEROUS" si verifichi dati alcuni valori
+    infer = VariableElimination(model)
+
+    # Definisci le evidenze
+    evidence = {'BOROUGH': "BROOKLYN", 'TRAFFIC STREET': "RALPH AVENUE", 'TEMPERATURE':"hot", 'RAIN_INTENSITY':"weak", 'WIND_INTENSITY':"weak", 'CLOUDCOVER':1}
+
+    # Crea un DataFrame per l'evidenza
+    evidence_df = pd.DataFrame([evidence])
+
+    # Effettua l'encoding per le variabili categoriche eccetto CLOUDCOVER
+    encoded_evidence = pd.DataFrame(encoder.transform(evidence_df[categorical_features]), columns=categorical_features)
+
+    # Combina l'evidenza codificata e la variabile CLOUDCOVER non codificata
+    final_evidence = pd.concat([encoded_evidence, evidence_df['CLOUDCOVER']], axis=1)
+
+    # Effettua l'inferenza
+    prob = infer.query(['IS_NOT_DANGEROUS'], evidence=final_evidence.iloc[0])
+
+    # Stampa i risultati
+    print(prob)   
+
+
+
 else:
     print("rete non valida")
-
-# Effettua l'inferenza per calcolare la probabilità che l'evento "IS_NOT_DANGEROUS" si verifichi dati alcuni valori
-infer = VariableElimination(model)
-
-# Definisci le evidenze
-evidence = {'BOROUGH': "BROOKLYN", 'TRAFFIC STREET': "RALPH AVENUE", 'TEMPERATURE':"hot", 'RAIN_INTENSITY':"weak", 'WIND_INTENSITY':"weak", 'CLOUDCOVER':1}
-
-# Crea un DataFrame per l'evidenza
-evidence_df = pd.DataFrame([evidence])
-
-# Effettua l'encoding per le variabili categoriche eccetto CLOUDCOVER
-encoded_evidence = pd.DataFrame(encoder.transform(evidence_df[categorical_features]), columns=categorical_features)
-
-# Combina l'evidenza codificata e la variabile CLOUDCOVER non codificata
-final_evidence = pd.concat([encoded_evidence, evidence_df['CLOUDCOVER']], axis=1)
-
-# Effettua l'inferenza
-prob = infer.query(['IS_NOT_DANGEROUS'], evidence=final_evidence.iloc[0])
-
-# Stampa i risultati
-print(prob)   
 

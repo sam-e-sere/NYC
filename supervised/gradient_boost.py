@@ -36,13 +36,18 @@ def gradientBoost(data, categorical_features, numeric_features, target):
         mean_test_r.append(recall_score(y_test, y_test_pred, average='macro'))
         mean_test_f.append(f1_score(y_test, y_test_pred, average='macro'))
 
+    plt.title('Training and Test score')
     plt.plot(n_estimators_range, mean_train_score, label="Training score")
     plt.plot(n_estimators_range, mean_test_score, label="Test score")
     plt.xlabel("Number of Trees")
     plt.ylabel("Score")
     plt.legend()
     plt.ylim([0.2, 1.0])
-    plt.show()
+    
+    # Specifica il percorso completo del file in cui salvare il grafico 
+    path = "images/gb_score.png" 
+    # Salva il grafico nella directory specificata 
+    plt.savefig(path)
 
     print(f"Media test acc: {np.mean(mean_test_score)}")
     print(f"Media test prec: {np.mean(mean_test_p)}")
