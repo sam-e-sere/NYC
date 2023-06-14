@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import OrdinalEncoder
 
-# Carica i dati sui tre dataset
+# Carica i dati sui due dataset e utilizza il dataset su cui è stato effettuato il merge
 incidenti = pd.read_csv("data/Selected Accidents.csv")
 generated = pd.read_csv("kb/generated_dataset.csv")
 merge = pd.merge(incidenti, generated, on="COLLISION_ID")
@@ -19,7 +19,7 @@ X = merge[categorical_features + boolean_features]
 encoder = OrdinalEncoder()
 X_encoded = pd.DataFrame(encoder.fit_transform(X[categorical_features]), columns=categorical_features)
 
-# Combinazione delle variabili codificate e delle variabili numeriche
+# Combinazione delle variabili codificate e delle variabili booleane
 X_encoded = pd.concat([X_encoded, X[boolean_features]], axis=1)
 
 # Crea la rete bayesiana
@@ -68,7 +68,7 @@ if model.check_model():
 else:
     print("rete non valida")
 
-# Effettua l'inferenza per calcolare la probabilità condizionata sul meteo dato le variabili incidenti
+# Effettua l'inferenza per calcolare la probabilità che l'evento "IS_NOT_DANGEROUS" si verifichi dati alcuni valori
 infer = VariableElimination(model)
 
 # Definisci le evidenze

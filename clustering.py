@@ -6,7 +6,8 @@ from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import OrdinalEncoder
 
 
-# Carica i dati 
+
+# Carica i dati sui due dataset e utilizza il dataset su cui è stato effettuato il merge
 df1 = pd.read_csv("data/Selected Accidents.csv")
 df2 = pd.read_csv("kb/generated_dataset.csv")
 data = pd.merge(df1, df2, on="COLLISION_ID")
@@ -17,12 +18,9 @@ numeric_features = ["NUMBER OF PERSONS INJURED", "NUMBER OF PERSONS KILLED", "CL
 
 X = data[categorical_features + numeric_features]
 
-
-
 # Encoding delle variabili categoriche
 encoder = OrdinalEncoder()
 X.loc[:, categorical_features] = encoder.fit_transform(X[categorical_features])
-
 
 # Calcola l'inerzia per diversi valori di k
 inertias = []
@@ -36,7 +34,6 @@ plt.title('Curva di elbow')
 plt.xlabel('Numero di cluster')
 plt.ylabel('Inerzia')
 plt.show()
-
 
 # Esegui il clustering con l'algoritmo k-means
 kmeans = KMeans(n_clusters=3, random_state=0, n_init=10)
@@ -69,7 +66,7 @@ plt.legend(title="Cluster", loc="upper right", markerscale=1, fontsize=10)
 
 plt.show()
 
-# Calcola l'indice di silhouette per il clustering
+# Calcola l'indice di silhouette (valutazione) per il clustering
 silhouette_avg = silhouette_score(X, kmeans.labels_)
 
 # Stampa l'indice di silhouette medio

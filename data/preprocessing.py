@@ -136,7 +136,7 @@ def extract_traffic():
     # visualizza il dataframe risultante
     traffic.to_csv("data/working_dataset/New NYC Traffic.csv", index=False, mode='w')
 
-
+#Unione dei tre dataset per trovare le righe che combaciano
 def union_dataset():
 
     incidenti = pd.read_csv("data/working_dataset/Complete Accidents.csv")
@@ -149,7 +149,6 @@ def union_dataset():
     incidenti['MM'] = incidenti['MM'].apply(trasformazione)
 
     incidenti['MM'] = incidenti['MM'].astype(int)
-
 
     incidenti_meteo = pd.merge(incidenti, meteo, on=['Y','M','D','HH'], how='inner')
 
@@ -204,11 +203,11 @@ def union_dataset():
     selected_traffic.to_csv("data/Selected Traffic.csv", index=False, mode='w')
 
 
-
+#Inserimento del giorno della settimana nel dataset INCIDENTI
 def day_of_week():
 
     # Carica il tuo dataset CSV in un dataframe Pandas
-    df = pd.read_csv("data/Selected Accidents.csv")  # Aggiorna il percorso al tuo dataset CSV
+    df = pd.read_csv("data/Selected Accidents.csv")  
 
     # Per ogni riga nel dataframe
     for index, row in df.iterrows():
