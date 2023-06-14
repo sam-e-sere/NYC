@@ -57,12 +57,13 @@ def borough_prediction():
     plt.xticks(np.arange(min(k_values), max(k_values)+1, 2.0))  # Imposta gli intervalli dell'asse x
     plt.ylabel("Accuratezza")
     plt.legend()
-    plt.show()
+    
+    # Specifica il percorso completo del file in cui salvare il grafico 
+    path = "images/knn_accuracy.png" 
+    # Salva il grafico nella directory specificata 
+    plt.savefig(path)
 
-    best_k=grid.best_params_['n_neighbors']
-
-    # Stampa il valore di k ottimale e l'accuratezza corrispondente
-    print("Valore ottimale di k:", best_k)
+    best_k=grid.best_params_['n_neighbors'] #il valore ottenuto è 5
 
     # Crea un'istanza del modello KNN
     knn = KNeighborsClassifier(n_neighbors=best_k)
