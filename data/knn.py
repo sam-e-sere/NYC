@@ -38,9 +38,6 @@ def borough_prediction():
     # Addestra il modello utilizzando GridSearchCV
     grid.fit(X_train, y_train)
 
-    # Estrai i risultati della ricerca dei parametri
-    results = grid.cv_results_
-
     # Calcola l'andamento dell'accuratezza al variare di k
     train_scores, test_scores = validation_curve(knn, X_train, y_train, param_name="n_neighbors", param_range=k_values, cv=5, scoring='accuracy')
 
@@ -66,7 +63,6 @@ def borough_prediction():
 
     # Stampa il valore di k ottimale e l'accuratezza corrispondente
     print("Valore ottimale di k:", best_k)
-    print("Accuratezza:", grid.best_score_)
 
     # Crea un'istanza del modello KNN
     knn = KNeighborsClassifier(n_neighbors=best_k)

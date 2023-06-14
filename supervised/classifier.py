@@ -38,17 +38,20 @@ numeric_features = ["M", "CLOUDCOVER", "AVERAGE_VOLUME", 'NUM_ACCIDENTS_BOROUGH'
 target = "IS_NOT_DANGEROUS"
 X = data[categorical_features + numeric_features]
 
+"""
 print("---DECISION TREE---")
 clf = decisionTree(data, categorical_features, numeric_features, target)
 printFeatureRanking(clf, X)
 
+"""
 print("---RANDOM FOREST---")
 clf = randomForest(data, categorical_features, numeric_features, target)
 printFeatureRanking(clf, X)
-
+"""
 print("---LOGISTIC REGRESSION---")
 clf = logisticRegression(data, categorical_features, numeric_features, target)
 printFeatureRanking(clf, X)
+
 
 print("---ADA BOOST---")
 clf = adaBoost(data, categorical_features, numeric_features, target)
@@ -60,3 +63,4 @@ printFeatureRanking(clf, X)
 
 print("---NAIVE BAYES CATEGORICAL---")
 clf = naiveBayesCategorical(data, categorical_features, target)
+"""
