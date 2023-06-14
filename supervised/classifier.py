@@ -1,4 +1,4 @@
-from matplotlib import pyplot as plt2
+from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 from decision_tree import decisionTree
@@ -14,15 +14,16 @@ def printFeatureRanking(clf, X, path):
     for f in range(0, 4):
         print("%d. %s (%f)" % (f+1, X.columns[indices[f]], importances[indices[f]]))
 
+    plt.clf()
     # Plotting dell'importanza delle feature
-    plt2.figure()
-    plt2.title("Feature importances")
-    plt2.bar(range(X.shape[1]), importances[indices], color="r", align="center")
-    plt2.xticks(range(X.shape[1]), [categorical_features[i] if i<len(categorical_features) else numeric_features[i-len(categorical_features)] for i in indices], rotation=90)
-    plt2.xlim([-1, X.shape[1]])
+    plt.figure()
+    plt.title("Feature importances")
+    plt.bar(range(X.shape[1]), importances[indices], color="r", align="center")
+    plt.xticks(range(X.shape[1]), [categorical_features[i] if i<len(categorical_features) else numeric_features[i-len(categorical_features)] for i in indices], rotation=90)
+    plt.xlim([-1, X.shape[1]])
 
     # Salva il grafico nella directory specificata 
-    plt2.savefig(path)
+    plt.savefig(path)
 
 # Caricamento del dataset
 df1 = pd.read_csv("data/Selected Accidents.csv")
@@ -37,19 +38,19 @@ X = data[categorical_features + numeric_features]
 
 print("---DECISION TREE---")
 clf = decisionTree(data, categorical_features, numeric_features, target)
-printFeatureRanking(clf, X, "images/dt_feature.png" )
+printFeatureRanking(clf, X, "images/features/dt_feature.png" )
 
 print("---RANDOM FOREST---")
 clf = randomForest(data, categorical_features, numeric_features, target)
-printFeatureRanking(clf, X, "images/rf_feature.png" )
+printFeatureRanking(clf, X, "images/features/rf_feature.png" )
 
 print("---ADA BOOST---")
 clf = adaBoost(data, categorical_features, numeric_features, target)
-printFeatureRanking(clf, X, "images/ab_feature.png" )
+printFeatureRanking(clf, X, "images/features/ab_feature.png" )
 
 print("---GRADIENT BOOST---")
 clf = gradientBoost(data, categorical_features, numeric_features, target)
-printFeatureRanking(clf, X, "images/gb_feature.png" )
+printFeatureRanking(clf, X, "images/features/gb_feature.png" )
 
 print("---NAIVE BAYES CATEGORICAL---")
 clf = naiveBayesCategorical(data, categorical_features, target)

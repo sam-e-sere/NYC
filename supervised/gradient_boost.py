@@ -36,6 +36,7 @@ def gradientBoost(data, categorical_features, numeric_features, target):
         mean_test_r.append(recall_score(y_test, y_test_pred, average='macro'))
         mean_test_f.append(f1_score(y_test, y_test_pred, average='macro'))
 
+    plt.clf()
     plt.title('Training and Test score')
     plt.plot(n_estimators_range, mean_train_score, label="Training score")
     plt.plot(n_estimators_range, mean_test_score, label="Test score")
