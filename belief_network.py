@@ -84,8 +84,8 @@ encoded_evidence = pd.DataFrame(encoder.transform(evidence_df[categorical_featur
 final_evidence = pd.concat([encoded_evidence, evidence_df['CLOUDCOVER']], axis=1)
 
 # Effettua l'inferenza
-prob_meteo_given_incidenti = infer.query(['IS_NOT_DANGEROUS'], evidence=final_evidence.iloc[0])
+prob = infer.query(['IS_NOT_DANGEROUS'], evidence=final_evidence.iloc[0])
 
 # Stampa i risultati
-print(prob_meteo_given_incidenti)   
+print(prob)   
 
