@@ -38,6 +38,7 @@ def decisionTree(data, categorical_features, numeric_features, target):
         mean_test_r.append(recall_score(y_test, y_test_pred, average='macro'))
         mean_test_f.append(f1_score(y_test, y_test_pred, average='macro'))
 
+    plt.clf()
     plt.title('Training and Test score')
     plt.plot(range(3, 26), mean_train_score, label="Training score")
     plt.plot(range(3, 26), mean_test_score, label="Test score")

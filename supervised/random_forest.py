@@ -47,7 +47,7 @@ def randomForest(data, categorical_features, numeric_features, target):
         mean_train_score_trees.append(accuracy_score(y_train, y_train_pred))
         mean_test_score_trees.append(accuracy_score(y_test, y_test_pred))
         
-
+    plt.clf()
     plt.figure(figsize=(8, 6))
     plt.title('Train and Test score')
     plt.plot(max_depth_range, mean_train_score_depth, label="Training score")
@@ -60,6 +60,7 @@ def randomForest(data, categorical_features, numeric_features, target):
     path = "images/rf_score_depth.png" 
     plt.savefig(path)
     
+    plt.clf()
     plt.figure(figsize=(8, 6))
     plt.title('Train and Test score')
     plt.plot(n_estimators_range, mean_train_score_trees, label="Training score")
