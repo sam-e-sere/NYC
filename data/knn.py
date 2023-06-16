@@ -2,7 +2,6 @@ from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score
-from sklearn.preprocessing import OrdinalEncoder
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import GridSearchCV, train_test_split, validation_curve
 
