@@ -1,6 +1,5 @@
 from datetime import datetime
 import pandas as pd
-from shapely.wkt import loads
 from knn import borough_prediction
 
 #Estrazione delle informazioni necessarie del file 'NYC weather'
@@ -108,6 +107,8 @@ def extract_accidents():
     # rimuove le righe con valori mancanti nelle colonne "LATITUDE" e "LONGITUDE"
     accidents = accidents.dropna(subset=['LATITUDE', 'LONGITUDE'])
 
+    accidents = day_of_week(accidents)
+
     # visualizza il dataframe risultante
     accidents.to_csv("data/working_dataset/New NYC Accidents.csv", index=False, mode='w')
 
@@ -170,12 +171,6 @@ def union_dataset():
     # concatena i due DataFrame lungo l'asse delle righe
     concatenaz = pd.concat([merged1, merged2, merged3], axis=0)
 
-    # identifica le righe duplicate escludendo la colonna TRAFFICO
-    duplicated_rows = concatenaz.duplicated(subset=['Y','M','D','HH','MM', 'BOROUGH','STREET NAME', 'CROSS STREET NAME', 'OFF STREET NAME'], keep='first')
-
-    # crea un DataFrame con le righe duplicate e le rispettive occorrenze di TRAFFICO
-    duplicated_df = concatenaz[duplicated_rows]
-
     # elimina le righe duplicate, tranne la prima occorrenza
     concatenaz.drop_duplicates(subset=['Y','M','D','HH','MM', 'BOROUGH','STREET NAME', 'CROSS STREET NAME', 'OFF STREET NAME'], keep='first', inplace=True)
 
@@ -188,11 +183,9 @@ def union_dataset():
 
     selected_weather = final.loc[:, ['Y', 'M', 'D', 'HH', 'temperature_2m (°C)','precipitation (mm)','rain (mm)','cloudcover_low (%)','windspeed_10m (km/h)','winddirection_10m (°)']]
     
-    selected_accidents = final.loc[:,['COLLISION_ID','Y', 'M', 'D', 'HH','MM','BOROUGH','LATITUDE','LONGITUDE','TRAFFIC STREET','NUMBER OF PERSONS INJURED','NUMBER OF PERSONS KILLED']]
+    selected_accidents = final.loc[:,['COLLISION_ID','Y', 'M', 'D', 'HH','MM','BOROUGH','LATITUDE','LONGITUDE','TRAFFIC STREET','NUMBER OF PERSONS INJURED','NUMBER OF PERSONS KILLED', 'DAY OF WEEK']]
 
     selected_traffic = final.loc[:,['TRAFFIC ID','Y', 'M', 'D', 'HH','MM','BOROUGH','VOL','TRAFFIC STREET']]
-
-    selected_accidents.fillna('unknown', inplace=True)
 
     selected_weather = selected_weather.drop_duplicates()
     selected_traffic = selected_traffic.drop_duplicates()
@@ -204,16 +197,13 @@ def union_dataset():
 
 
 #Inserimento del giorno della settimana nel dataset INCIDENTI
-def day_of_week():
-
-    # Carica il tuo dataset CSV in un dataframe Pandas
-    df = pd.read_csv("data/Selected Accidents.csv")  
+def day_of_week(df):
 
     # Per ogni riga nel dataframe
     for index, row in df.iterrows():
         # Estrai le informazioni sulla data dalle colonne Y, M e D
-        year, month, day = row["Y"], row["M"], row["D"]
-        
+        year, month, day = int(row["Y"]), int(row["M"]), int(row["D"])
+
         # Costruisci la stringa data nel formato "YYYY-MM-DD"
         date_str = f"{year:04d}-{month:02d}-{day:02d}"
         
@@ -226,8 +216,7 @@ def day_of_week():
         # Aggiungi l'informazione del giorno della settimana al dataframe
         df.loc[index, "DAY OF WEEK"] = day_of_week
 
-    # Salva il dataframe con l'informazione aggiuntiva sul giorno della settimana in un nuovo file CSV
-    df.to_csv("data/Selected Accidents.csv", index=False, mode = 'w')  # Aggiorna il percorso al tuo nuovo file CSV
+    return df
 
 def main():
     extract_weather()
@@ -235,7 +224,6 @@ def main():
     extract_traffic()
     borough_prediction()
     union_dataset()
-    day_of_week()
 
 
 main()
