@@ -4,7 +4,6 @@ import pandas as pd
 from decision_tree import decisionTree
 from random_forest import randomForest
 from ada_boost import adaBoost
-from gradient_boost import gradientBoost
 from naiveBayesCategorico import naiveBayesCategorical
 
 def printFeatureRanking(clf, X, path):
@@ -44,14 +43,10 @@ print("\n---RANDOM FOREST---")
 clf = randomForest(data, categorical_features, numeric_features, target)
 printFeatureRanking(clf, X, "images/features/rf_feature.png" )
 
+print("\n---NAIVE BAYES CATEGORICAL---")
+clf = naiveBayesCategorical(data, categorical_features, target)
+
 print("\n---ADA BOOST---")
 clf = adaBoost(data, categorical_features, numeric_features, target)
 printFeatureRanking(clf, X, "images/features/ab_feature.png" )
-
-print("\n---GRADIENT BOOST---")
-clf = gradientBoost(data, categorical_features, numeric_features, target)
-printFeatureRanking(clf, X, "images/features/gb_feature.png" )
-
-print("\n---NAIVE BAYES CATEGORICAL---")
-clf = naiveBayesCategorical(data, categorical_features, target)
 
