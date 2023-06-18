@@ -57,13 +57,6 @@ def randomForest(data, categorical_features, numeric_features, target):
     path = "images/rf_score_number_of_trees.png" 
     plt.savefig(path)
 
-    print("Valutazione number of trees:")
-    print(f"Media test acc: {np.mean(mean_test_score_trees)}")
-    print(f"Media test prec: {np.mean(mean_test_p_trees)}")
-    print(f"Media test rec: {np.mean(mean_test_r_trees)}")
-    print(f"Media test f-measure: {np.mean(mean_test_f_trees)}")  
-
-
 
 #Valutazione modello con profondità degli alberi
     for i in max_depth_range:
@@ -90,8 +83,6 @@ def randomForest(data, categorical_features, numeric_features, target):
     path = "images/rf_score_depth.png" 
     plt.savefig(path)
 
-
-    print("\nValutazione tree depth:")
     print(f"Media test acc: {np.mean(mean_test_score_depth)}")
     print(f"Media test prec: {np.mean(mean_test_p)}")
     print(f"Media test rec: {np.mean(mean_test_r)}")
