@@ -20,18 +20,19 @@ def naiveBayesCategorical(data, categorical_features, target):
     clf.fit(X_train, y_train)
 
     # Valutazione del modello sui dati di test
+    y_train_pred = clf.predict(X_train)
+    train_acc = accuracy_score(y_train, y_train_pred)
     y_pred = clf.predict(X_test)
-    train_acc = clf.score(X_train, y_train)
     acc = accuracy_score(y_test, y_pred)
     prec = precision_score(y_test, y_pred, average='macro')
     rec = recall_score(y_test, y_pred, average='macro')
     f1 = f1_score(y_test, y_pred, average='macro')
 
     
-    print(f"Train Accuracy: {train_acc}")
-    print(f"Test Accuracy: {acc}")
-    print(f"Test Precision: {prec}")
-    print(f"Test Recall: {rec}")
-    print(f"Test F1-score: {f1}")
+    print(f"Average Accuracy: {train_acc}")
+    print(f"Average Accuracy: {acc}")
+    print(f"Average Precision: {prec}")
+    print(f"Average Recall: {rec}")
+    print(f"Average F1-score: {f1}")
 
     return clf

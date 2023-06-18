@@ -83,9 +83,9 @@ def randomForest(data, categorical_features, numeric_features, target):
     path = "images/rf_score_depth.png" 
     plt.savefig(path)
 
-    print(f"Media test acc: {np.mean(mean_test_score_depth)}")
-    print(f"Media test prec: {np.mean(mean_test_p)}")
-    print(f"Media test rec: {np.mean(mean_test_r)}")
-    print(f"Media test f-measure: {np.mean(mean_test_f)}")
+    print(f"Average Test Accuracy: {np.mean(mean_test_score_depth)}")
+    print(f"Average Test Precision: {np.mean(mean_test_p)}")
+    print(f"Average Test Recall: {np.mean(mean_test_r)}")
+    print(f"Average Test F1-score: {np.mean(mean_test_f)}")
 
     return clf
