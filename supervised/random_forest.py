@@ -22,12 +22,50 @@ def randomForest(data, categorical_features, numeric_features, target):
 
     mean_train_score_depth = []
     mean_test_score_depth = []
-    mean_train_score_trees = []
-    mean_test_score_trees = []
     mean_test_p = []
     mean_test_r = []
     mean_test_f = []
-    
+
+    mean_train_score_trees = []
+    mean_test_score_trees = []
+    mean_test_p_trees = []
+    mean_test_r_trees = []
+    mean_test_f_trees = []
+
+    #Valutazione modello con numero di alberi
+    for i in n_estimators_range:
+        clf = RandomForestClassifier(n_estimators=i, max_depth=10, criterion="entropy", random_state=0)
+        clf.fit(X_train, y_train)
+        y_train_pred = clf.predict(X_train)
+        y_test_pred = clf.predict(X_test)
+        mean_train_score_trees.append(accuracy_score(y_train, y_train_pred))
+        mean_test_score_trees.append(accuracy_score(y_test, y_test_pred))
+        mean_test_p_trees.append(precision_score(y_test, y_test_pred, average='macro', zero_division = 0))
+        mean_test_r_trees.append(recall_score(y_test, y_test_pred, average='macro'))
+        mean_test_f_trees.append(f1_score(y_test, y_test_pred, average='macro'))
+
+
+    plt.clf()
+    plt.figure(figsize=(8, 6))
+    plt.title('Train and Test score')
+    plt.plot(n_estimators_range, mean_train_score_trees, label="Training score")
+    plt.plot(n_estimators_range, mean_test_score_trees, label="Test score")
+    plt.xlabel("Number of Trees")
+    plt.ylabel("Score")
+    plt.legend()
+    plt.ylim([0.2, 1.0])
+    path = "images/rf_score_number_of_trees.png" 
+    plt.savefig(path)
+
+    print("Valutazione number of trees:")
+    print(f"Media test acc: {np.mean(mean_test_score_trees)}")
+    print(f"Media test prec: {np.mean(mean_test_p_trees)}")
+    print(f"Media test rec: {np.mean(mean_test_r_trees)}")
+    print(f"Media test f-measure: {np.mean(mean_test_f_trees)}")  
+
+
+
+#Valutazione modello con profondità degli alberi
     for i in max_depth_range:
         clf = RandomForestClassifier(n_estimators=100, max_depth=i, criterion="entropy", random_state=0)
         clf.fit(X_train, y_train)
@@ -38,14 +76,7 @@ def randomForest(data, categorical_features, numeric_features, target):
         mean_test_p.append(precision_score(y_test, y_test_pred, average='macro', zero_division = 0))
         mean_test_r.append(recall_score(y_test, y_test_pred, average='macro'))
         mean_test_f.append(f1_score(y_test, y_test_pred, average='macro'))
-    
-    for i in n_estimators_range:
-        clf = RandomForestClassifier(n_estimators=i, max_depth=10, criterion="entropy", random_state=0)
-        clf.fit(X_train, y_train)
-        y_train_pred = clf.predict(X_train)
-        y_test_pred = clf.predict(X_test)
-        mean_train_score_trees.append(accuracy_score(y_train, y_train_pred))
-        mean_test_score_trees.append(accuracy_score(y_test, y_test_pred))
+
         
     plt.clf()
     plt.figure(figsize=(8, 6))
@@ -56,23 +87,11 @@ def randomForest(data, categorical_features, numeric_features, target):
     plt.ylabel("Score")
     plt.legend()
     plt.ylim([0.2, 1.0])
-    # Specifica il percorso completo del file in cui salvare il grafico 
     path = "images/rf_score_depth.png" 
     plt.savefig(path)
-    
-    plt.clf()
-    plt.figure(figsize=(8, 6))
-    plt.title('Train and Test score')
-    plt.plot(n_estimators_range, mean_train_score_trees, label="Training score")
-    plt.plot(n_estimators_range, mean_test_score_trees, label="Test score")
-    plt.xlabel("Number of Trees")
-    plt.ylabel("Score")
-    plt.legend()
-    plt.ylim([0.2, 1.0])
-    # Specifica il percorso completo del file in cui salvare il grafico 
-    path = "images/rf_score_number_of_trees.png" 
-    plt.savefig(path)
 
+
+    print("\nValutazione tree depth:")
     print(f"Media test acc: {np.mean(mean_test_score_depth)}")
     print(f"Media test prec: {np.mean(mean_test_p)}")
     print(f"Media test rec: {np.mean(mean_test_r)}")

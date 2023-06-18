@@ -47,9 +47,7 @@ def adaBoost(data, categorical_features, numeric_features, target):
     plt.legend()
     plt.ylim([0.2, 1.0])
     
-    # Specifica il percorso completo del file in cui salvare il grafico 
     path = "images/ab_score.png" 
-    # Salva il grafico nella directory specificata 
     plt.savefig(path)
 
 

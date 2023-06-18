@@ -57,9 +57,7 @@ def borough_prediction():
     plt.ylabel("Accuratezza")
     plt.legend()
     
-    # Specifica il percorso completo del file in cui salvare il grafico 
     path = "images/knn_accuracy.png" 
-    # Salva il grafico nella directory specificata 
     plt.savefig(path)
 
     best_k=grid.best_params_['n_neighbors'] #il valore ottenuto è 5

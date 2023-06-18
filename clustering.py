@@ -31,7 +31,6 @@ plt.plot(range(1, 11), inertias)
 plt.title('Curva di elbow')
 plt.xlabel('Numero di cluster')
 plt.ylabel('Inerzia')
-# Specifica il percorso completo del file in cui salvare il grafico 
 path = "images/elbow.png" 
 plt.savefig(path)
 
@@ -67,7 +66,6 @@ for label in cluster_labels:
     plt.scatter([], [], color=cmap(label), alpha=0.5, label='Cluster {}'.format(label))
 plt.legend(title="Cluster", loc="upper right", markerscale=1, fontsize=10)
 
-# Specifica il percorso completo del file in cui salvare il grafico 
 path = "images/clustering.png" 
 plt.savefig(path)
 

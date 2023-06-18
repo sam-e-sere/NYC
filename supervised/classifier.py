@@ -10,7 +10,7 @@ from naiveBayesCategorico import naiveBayesCategorical
 def printFeatureRanking(clf, X, path):
     importances = clf.feature_importances_
     indices = np.argsort(importances)[::-1]
-    print("Feature ranking:")
+    print("\nFeature ranking:")
     for f in range(0, 4):
         print("%d. %s (%f)" % (f+1, X.columns[indices[f]], importances[indices[f]]))
 
@@ -23,7 +23,6 @@ def printFeatureRanking(clf, X, path):
     plt.xlim([-1, X.shape[1]])
     plt.subplots_adjust(bottom=0.4)
 
-    # Salva il grafico nella directory specificata 
     plt.savefig(path)
 
 # Caricamento del dataset
@@ -37,22 +36,22 @@ numeric_features = ["M", "CLOUDCOVER", "AVERAGE_VOLUME", 'NUM_ACCIDENTS_BOROUGH'
 target = "IS_NOT_DANGEROUS"
 X = data[categorical_features + numeric_features]
 
-print("---DECISION TREE---")
+print("\n---DECISION TREE---")
 clf = decisionTree(data, categorical_features, numeric_features, target)
 printFeatureRanking(clf, X, "images/features/dt_feature.png" )
 
-print("---RANDOM FOREST---")
+print("\n---RANDOM FOREST---")
 clf = randomForest(data, categorical_features, numeric_features, target)
 printFeatureRanking(clf, X, "images/features/rf_feature.png" )
 
-print("---ADA BOOST---")
+print("\n---ADA BOOST---")
 clf = adaBoost(data, categorical_features, numeric_features, target)
 printFeatureRanking(clf, X, "images/features/ab_feature.png" )
 
-print("---GRADIENT BOOST---")
+print("\n---GRADIENT BOOST---")
 clf = gradientBoost(data, categorical_features, numeric_features, target)
 printFeatureRanking(clf, X, "images/features/gb_feature.png" )
 
-print("---NAIVE BAYES CATEGORICAL---")
+print("\n---NAIVE BAYES CATEGORICAL---")
 clf = naiveBayesCategorical(data, categorical_features, target)
 

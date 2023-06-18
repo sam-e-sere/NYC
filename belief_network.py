@@ -101,9 +101,8 @@ if model.check_model():
     right_margin = max_size - x_size - left_margin
     plt.xlim(x_min - left_margin - x_margin, x_max + right_margin + x_margin)
     
-    # Specifica il percorso completo del file in cui salvare il grafico 
+
     path = "images/belief_network.png" 
-    # Salva il grafico nella directory specificata 
     plt.savefig(path)
 
     # Effettua l'inferenza per calcolare la probabilità che l'evento "IS_NOT_DANGEROUS" si verifichi dati alcuni valori
