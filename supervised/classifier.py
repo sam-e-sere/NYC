@@ -18,7 +18,7 @@ def printFeatureRanking(clf, X, path):
     # Plotting dell'importanza delle feature
     plt.figure()
     plt.title("Feature importances")
-    plt.bar(range(X.shape[1]), importances[indices], color="r", align="center")
+    plt.bar(range(X.shape[1]), importances[indices], color="orange", align="center")
     plt.xticks(range(X.shape[1]), [categorical_features[i] if i<len(categorical_features) else numeric_features[i-len(categorical_features)] for i in indices], rotation=90)
     plt.xlim([-1, X.shape[1]])
 
@@ -39,7 +39,7 @@ X = data[categorical_features + numeric_features]
 print("---DECISION TREE---")
 clf = decisionTree(data, categorical_features, numeric_features, target)
 printFeatureRanking(clf, X, "images/features/dt_feature.png" )
-
+""""
 print("---RANDOM FOREST---")
 clf = randomForest(data, categorical_features, numeric_features, target)
 printFeatureRanking(clf, X, "images/features/rf_feature.png" )
@@ -54,4 +54,4 @@ printFeatureRanking(clf, X, "images/features/gb_feature.png" )
 
 print("---NAIVE BAYES CATEGORICAL---")
 clf = naiveBayesCategorical(data, categorical_features, target)
-
+"""
