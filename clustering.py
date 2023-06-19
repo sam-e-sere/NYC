@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+import numpy as np
 import matplotlib
 import pandas as pd
 from sklearn.cluster import KMeans
@@ -25,6 +26,18 @@ inertias = []
 for k in range(1, 11):
     kmeans = KMeans(n_clusters=k, random_state=0,  n_init=10).fit(X)
     inertias.append(kmeans.inertia_)
+    """"
+    print("con K = ", k)
+    # Ottieni le etichette di cluster assegnate a ciascun esempio
+    cluster_labels = kmeans.labels_
+
+    # Calcola il numero di esempi in ogni cluster
+    cluster_counts = np.bincount(cluster_labels)
+
+    # Stampa il numero di esempi in ogni cluster
+    for cluster, count in enumerate(cluster_counts):
+        print(f"Cluster {cluster}: {count} esempi")
+    """
 
 # Traccia la curva di elbow
 plt.plot(range(1, 11), inertias)
@@ -35,7 +48,7 @@ path = "images/elbow.png"
 plt.savefig(path)
 
 # Esegui il clustering con l'algoritmo k-means
-kmeans = KMeans(n_clusters=3, random_state=0, n_init=10)
+kmeans = KMeans(n_clusters=4, random_state=0, n_init=10)
 
 kmeans.fit(X)
 
