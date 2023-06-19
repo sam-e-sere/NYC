@@ -20,7 +20,7 @@ X = data[categorical_features + numeric_features]
 encoder = OrdinalEncoder()
 X.loc[:, categorical_features] = encoder.fit_transform(X[categorical_features])
 
-# Calcola l'inerzia per diversi valori di k
+# Calcola l'inerzia (somma dei quadrati delle distanze tra ogni osservazione e il centroide del suo cluster) per diversi valori di k
 inertias = []
 for k in range(1, 11):
     kmeans = KMeans(n_clusters=k, random_state=0,  n_init=10).fit(X)
@@ -39,14 +39,14 @@ kmeans = KMeans(n_clusters=3, random_state=0, n_init=10)
 
 kmeans.fit(X)
 
-# Aggiungi i centroidi del clustering al dataset
+# Aggiungi i cluster al dataset
 data["Cluster"] = kmeans.predict(X)
 
 # Seleziona le feature per il grafico scatter
 feature1 = "LONGITUDE"
 feature2 = "LATITUDE"
 
-#il grafico scatter dovrebbe mostrare eventuali aree della città dove si verificano incidenti stradali con caratteristiche simili, 
+#il grafico scatter mostra eventuali aree della città dove si verificano incidenti stradali con caratteristiche simili, 
 # come ad esempio un alto numero di persone ferite o uccise.
 
 # Crea il grafico scatter colorato in base all'etichetta di cluster

@@ -10,7 +10,7 @@ def printFeatureRanking(clf, X, path):
     importances = clf.feature_importances_
     indices = np.argsort(importances)[::-1]
     print("\nFeature ranking:")
-    for f in range(0, 4):
+    for f in range(0, 5):
         print("%d. %s (%f)" % (f+1, X.columns[indices[f]], importances[indices[f]]))
 
     plt.clf()
