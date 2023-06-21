@@ -63,18 +63,11 @@ for variable in X_encoded.columns:
     cpd_values = counts.pivot_table(values='counts', index=parents, columns=[variable], fill_value=0)
     cpd_values = cpd_values.div(cpd_values.sum(axis=1), axis=0)
 
-    # Crea la CPD solo se ci sono combinazioni di valori nel dataset
-    if not cpd_values.empty:
-        # Crea la CPD utilizzando la classe TabularCPD di pgmpy
-        cpd = TabularCPD(variable=variable, variable_card=variable_card[variable],
-                        values=cpd_values.values.T.tolist(), evidence=parents,
-                        evidence_card=[variable_card[p] for p in parents])
-    else:
-        # Crea una CPD vuota con probabilità zero
-        cpd = TabularCPD(variable=variable, variable_card=variable_card[variable],
-                        values=np.zeros(variable_card[variable]), evidence=parents,
-                        evidence_card=[variable_card[p] for p in parents])
-    print(cpd)
+    # Crea la CPD utilizzando la classe TabularCPD di pgmpy
+    cpd = TabularCPD(variable=variable, variable_card=variable_card[variable],
+                    values=cpd_values.values.T.tolist(), evidence=parents,
+                    evidence_card=[variable_card[p] for p in parents])
+
     cpds.append(cpd)
 
 # Aggiungi le CPD alla rete bayesiana
@@ -84,7 +77,7 @@ for cpd in cpds:
 if model.check_model():
     print("rete valida")
 
-
+    """
     # Creazione del grafo
     G = nx.DiGraph()
     G.add_nodes_from(model.nodes())
@@ -119,14 +112,13 @@ if model.check_model():
 
     path = "images/belief_network.png" 
     plt.savefig(path)
-
-
+    """
 
     # Effettua l'inferenza per calcolare la probabilità che l'evento "IS_NOT_DANGEROUS" si verifichi dati alcuni valori
     infer = VariableElimination(model)
 
     # Definisci le evidenze
-    evidence = {'TEMPERATURE':"mild", 'RAIN_INTENSITY':"unknown", 'WIND_INTENSITY':"weak", 'CLOUDCOVER':0}
+    evidence = {'TEMPERATURE':"mild", 'RAIN_INTENSITY':"weak", 'WIND_INTENSITY':"moderate", 'CLOUDCOVER':1}
 
     # Crea un DataFrame per l'evidenza
     evidence_df = pd.DataFrame([evidence])
@@ -142,7 +134,6 @@ if model.check_model():
 
     # Stampa i risultati
     print(prob)   
-
 
 
 else:
