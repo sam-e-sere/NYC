@@ -44,9 +44,12 @@ for variable in X_encoded.columns:
     # Conta il numero di volte in cui ogni combinazione di valori si verifica
     counts = X_encoded.groupby(parents + [variable]).size().reset_index(name='counts')
 
-    # Normalizza le frequenze relative per ottenere le probabilità condizionali
+    # Normalizza le frequenze relative per ottenere le probabilità condizionate
     cpd_values = counts.pivot_table(values='counts', index=parents, columns=variable, fill_value=0)
-    cpd_values = cpd_values.div(cpd_values.sum(axis=1), axis=0)
+    if parents:
+        counts = X_encoded.groupby(parents + [variable]).size().reset_index(name='counts')
+    else:
+        counts = X_encoded.groupby(variable).size().reset_index(name='counts')
 
     # Crea la CPD solo se ci sono combinazioni di valori nel dataset
     if not cpd_values.empty:
@@ -81,8 +84,6 @@ if model.check_model():
 
     # Disegno del grafo
     nx.draw(G, with_labels=True, node_color='lightblue', edge_color='grey', font_weight='bold')
-
-    
 
     # Regola la posizione dei nodi per aggiungere un margine intorno ai nodi
     x_vals, y_vals = zip(*pos.values())
