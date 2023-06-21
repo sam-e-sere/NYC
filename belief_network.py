@@ -46,10 +46,7 @@ for variable in X_encoded.columns:
 
     # Normalizza le frequenze relative per ottenere le probabilità condizionate
     cpd_values = counts.pivot_table(values='counts', index=parents, columns=variable, fill_value=0)
-    if parents:
-        counts = X_encoded.groupby(parents + [variable]).size().reset_index(name='counts')
-    else:
-        counts = X_encoded.groupby(variable).size().reset_index(name='counts')
+    cpd_values = cpd_values.div(cpd_values.sum(axis=1), axis=0)
 
     # Crea la CPD solo se ci sono combinazioni di valori nel dataset
     if not cpd_values.empty:
