@@ -12,7 +12,7 @@ incidenti = pd.read_csv("data/Selected Accidents.csv")
 generated = pd.read_csv("kb/generated_dataset.csv")
 merge = pd.merge(incidenti, generated, on="COLLISION_ID")
 
-categorical_features = ["BOROUGH", "TRAFFIC STREET", "TEMPERATURE", "RAIN_INTENSITY", "WIND_INTENSITY"]
+categorical_features = ["TEMPERATURE", "RAIN_INTENSITY", "WIND_INTENSITY"]
 boolean_features = ["CLOUDCOVER", "IS_NOT_DANGEROUS"]
 
 X = merge[categorical_features + boolean_features]
@@ -30,10 +30,10 @@ model = BayesianNetwork()
 model.add_nodes_from(X_encoded.columns)
 
 # Aggiungi gli archi per modellare le dipendenze tra le variabili
-model.add_edges_from([('BOROUGH', 'TRAFFIC STREET')])
+model.add_edges_from([('TEMPERATURE', 'IS_NOT_DANGEROUS'), ('RAIN_INTENSITY', 'IS_NOT_DANGEROUS'), ('WIND_INTENSITY', 'IS_NOT_DANGEROUS'), ('CLOUDCOVER', 'IS_NOT_DANGEROUS')])
 
 # Definisci il numero di possibili valori per ogni variabile
-variable_card = {'BOROUGH': 5, 'TRAFFIC STREET': 264, 'TEMPERATURE': 3, 'RAIN_INTENSITY': 5, 'WIND_INTENSITY': 3, 'CLOUDCOVER': 2, 'IS_NOT_DANGEROUS': 2}
+variable_card = {'TEMPERATURE': 3, 'RAIN_INTENSITY': 5, 'WIND_INTENSITY': 3, 'CLOUDCOVER': 2, 'IS_NOT_DANGEROUS': 2}
 
 # Definisci le CPD per ogni variabile
 cpds = []
@@ -41,11 +41,26 @@ cpds = []
 for variable in X_encoded.columns:
     parents = model.get_parents(variable)
 
-    # Conta il numero di volte in cui ogni combinazione di valori si verifica
-    counts = X_encoded.groupby(parents + [variable]).size().reset_index(name='counts')
+    if variable == 'IS_NOT_DANGEROUS':
+        import itertools
+
+        # Crea tutte le possibili combinazioni di valori per i genitori e la variabile
+        parents_values = list(itertools.product(*[X_encoded[parent_var].unique() for parent_var in parents]))
+        variable_values = X_encoded[variable].unique()
+        all_combinations = [(parents_value + (variable_value,)) for parents_value in parents_values for variable_value in variable_values.tolist()]
+        # Crea un nuovo dataframe contenente tutte le possibili combinazioni di genitori e variabile
+        new_df = pd.DataFrame(all_combinations, columns=parents+[variable])
+
+        # Unisci il nuovo dataframe con il dataframe originale per contare le occorrenze
+        counts = pd.merge(new_df, X_encoded, on=parents+[variable], how='left').fillna(0)
+        counts = counts.groupby(parents + [variable]).size().reset_index(name='counts')
+    else:
+        # Conta il numero di volte in cui ogni combinazione di valori si verifica
+        counts = X_encoded.groupby(parents + [variable]).size().reset_index(name='counts')
+
 
     # Normalizza le frequenze relative per ottenere le probabilità condizionate
-    cpd_values = counts.pivot_table(values='counts', index=parents, columns=variable, fill_value=0)
+    cpd_values = counts.pivot_table(values='counts', index=parents, columns=[variable], fill_value=0)
     cpd_values = cpd_values.div(cpd_values.sum(axis=1), axis=0)
 
     # Crea la CPD solo se ci sono combinazioni di valori nel dataset
@@ -59,6 +74,7 @@ for variable in X_encoded.columns:
         cpd = TabularCPD(variable=variable, variable_card=variable_card[variable],
                         values=np.zeros(variable_card[variable]), evidence=parents,
                         evidence_card=[variable_card[p] for p in parents])
+    print(cpd)
     cpds.append(cpd)
 
 # Aggiungi le CPD alla rete bayesiana
@@ -67,6 +83,7 @@ for cpd in cpds:
 
 if model.check_model():
     print("rete valida")
+
 
     # Creazione del grafo
     G = nx.DiGraph()
@@ -103,11 +120,13 @@ if model.check_model():
     path = "images/belief_network.png" 
     plt.savefig(path)
 
+
+
     # Effettua l'inferenza per calcolare la probabilità che l'evento "IS_NOT_DANGEROUS" si verifichi dati alcuni valori
     infer = VariableElimination(model)
 
     # Definisci le evidenze
-    evidence = {'BOROUGH': "BROOKLYN", 'TRAFFIC STREET': "RALPH AVENUE", 'TEMPERATURE':"hot", 'RAIN_INTENSITY':"weak", 'WIND_INTENSITY':"weak", 'CLOUDCOVER':1}
+    evidence = {'TEMPERATURE':"mild", 'RAIN_INTENSITY':"unknown", 'WIND_INTENSITY':"weak", 'CLOUDCOVER':0}
 
     # Crea un DataFrame per l'evidenza
     evidence_df = pd.DataFrame([evidence])
