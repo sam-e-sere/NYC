@@ -28,10 +28,10 @@ def naiveBayesCategorical(data, categorical_features, target):
     f1 = f1_score(y_test, y_pred, average='macro')
 
     
-    print(f"Average Accuracy: {train_acc}")
-    print(f"Average Accuracy: {acc}")
-    print(f"Average Precision: {prec}")
-    print(f"Average Recall: {rec}")
-    print(f"Average F1-score: {f1}")
+    print(f"Accuracy: {train_acc}")
+    print(f"Accuracy: {acc}")
+    print(f"Precision: {prec}")
+    print(f"Recall: {rec}")
+    print(f"F1-score: {f1}")
 
     return clf
