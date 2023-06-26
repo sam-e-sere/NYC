@@ -1,7 +1,6 @@
-import pandas as pd
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import cross_validate, train_test_split
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.preprocessing import OrdinalEncoder
 import numpy as np
@@ -38,6 +37,7 @@ def adaBoost(data, categorical_features, numeric_features, target):
         mean_test_r.append(recall_score(y_test, y_test_pred, average='macro'))
         mean_test_f.append(f1_score(y_test, y_test_pred, average='macro'))
 
+    #creazione del grafico
     plt.clf()
     plt.title('Training and Test score')
     plt.plot(n_estimators_range, mean_train_score, label="Training score")

@@ -1,6 +1,5 @@
-import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import cross_validate, train_test_split
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.preprocessing import OrdinalEncoder
 import numpy as np
@@ -44,7 +43,7 @@ def randomForest(data, categorical_features, numeric_features, target):
         mean_test_r_trees.append(recall_score(y_test, y_test_pred, average='macro'))
         mean_test_f_trees.append(f1_score(y_test, y_test_pred, average='macro'))
 
-
+    #creazione del grafico
     plt.clf()
     plt.figure(figsize=(8, 6))
     plt.title('Train and Test score')
@@ -58,7 +57,7 @@ def randomForest(data, categorical_features, numeric_features, target):
     plt.savefig(path)
 
 
-#Valutazione modello con profondità degli alberi
+    #Valutazione modello con profondità degli alberi
     for i in max_depth_range:
         clf = RandomForestClassifier(n_estimators=100, max_depth=i, criterion="entropy", random_state=0)
         clf.fit(X_train, y_train)
@@ -70,7 +69,7 @@ def randomForest(data, categorical_features, numeric_features, target):
         mean_test_r.append(recall_score(y_test, y_test_pred, average='macro'))
         mean_test_f.append(f1_score(y_test, y_test_pred, average='macro'))
 
-        
+    #creazione del grafico    
     plt.clf()
     plt.figure(figsize=(8, 6))
     plt.title('Train and Test score')

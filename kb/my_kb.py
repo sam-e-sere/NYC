@@ -3,6 +3,7 @@ from load_kb import create_prolog_kb
 import pandas as pd
 from pyswip import Prolog
 
+#creazione delle clausole
 def create_kb() -> Prolog:
     prolog = Prolog()
 
@@ -40,6 +41,7 @@ def create_kb() -> Prolog:
     return prolog
 
 
+#query sulla KB
 def calculate_features(kb, accident_id, final=False) -> dict:
     features_dict = {}
 
@@ -68,10 +70,8 @@ def calculate_features(kb, accident_id, final=False) -> dict:
 def query_boolean_result(kb, query_str: str):
     return min(len(list(kb.query(query_str))), 1)
 
-
+#creazione del dataset con la nuove feature
 def produce_working_dataset(kb: Prolog, path: str, final=False):
-    print(f"Producing dataset at {path}")
-    start = time.time()
     accidents_complete: pd.DataFrame = pd.read_csv("data/Selected Accidents.csv")
 
     extracted_values_df = None
@@ -87,13 +87,12 @@ def produce_working_dataset(kb: Prolog, path: str, final=False):
             extracted_values_df = pd.concat([extracted_values_df, pd.DataFrame([features_dict])], ignore_index=True)
 
     extracted_values_df.to_csv(path, index=False, mode ="w")
-    end = time.time()
-    print("Total time: ", end-start)
 
 
 def main():
     create_prolog_kb()
     knowledge_base = create_kb()
     produce_working_dataset(knowledge_base, "kb/generated_dataset.csv")
+    print("Created generated_dataset")
 
 main()

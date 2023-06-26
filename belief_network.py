@@ -1,11 +1,11 @@
-import networkx as nx
 from matplotlib import pyplot as plt
 from pgmpy.models import BayesianNetwork
 from pgmpy.inference import VariableElimination
 from pgmpy.factors.discrete import TabularCPD
 import pandas as pd
-import numpy as np
 from sklearn.preprocessing import OrdinalEncoder
+import networkx as nx
+import itertools
 
 # Carica i dati sui due dataset e utilizza il dataset su cui è stato effettuato il merge
 incidenti = pd.read_csv("data/Selected Accidents.csv")
@@ -42,7 +42,6 @@ for variable in X_encoded.columns:
     parents = model.get_parents(variable)
 
     if variable == 'IS_NOT_DANGEROUS':
-        import itertools
 
         # Crea tutte le possibili combinazioni di valori per i genitori e la variabile
         parents_values = list(itertools.product(*[X_encoded[parent_var].unique() for parent_var in parents]))
@@ -63,7 +62,7 @@ for variable in X_encoded.columns:
     cpd_values = counts.pivot_table(values='counts', index=parents, columns=[variable], fill_value=0)
     cpd_values = cpd_values.div(cpd_values.sum(axis=1), axis=0)
 
-    # Crea la CPD utilizzando la classe TabularCPD di pgmpy
+    # Crea la CPD
     cpd = TabularCPD(variable=variable, variable_card=variable_card[variable],
                     values=cpd_values.values.T.tolist(), evidence=parents,
                     evidence_card=[variable_card[p] for p in parents])
@@ -75,9 +74,8 @@ for cpd in cpds:
     model.add_cpds(cpd)
 
 if model.check_model():
-    print("rete valida")
+    print("\n La rete è valida \n")
 
-    """
     # Creazione del grafo
     G = nx.DiGraph()
     G.add_nodes_from(model.nodes())
@@ -112,13 +110,15 @@ if model.check_model():
 
     path = "images/belief_network.png" 
     plt.savefig(path)
-    """
+
 
     # Effettua l'inferenza per calcolare la probabilità che l'evento "IS_NOT_DANGEROUS" si verifichi dati alcuni valori
     infer = VariableElimination(model)
 
-    # Definisci le evidenze
     evidence = {'TEMPERATURE':"mild", 'RAIN_INTENSITY':"weak", 'WIND_INTENSITY':"moderate", 'CLOUDCOVER':1}
+
+    
+    print("L'evidenza è: ",evidence ,"\n")
 
     # Crea un DataFrame per l'evidenza
     evidence_df = pd.DataFrame([evidence])
@@ -137,5 +137,5 @@ if model.check_model():
 
 
 else:
-    print("rete non valida")
+    print("\n La rete non è valida \n")
 

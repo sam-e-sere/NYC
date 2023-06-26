@@ -6,6 +6,7 @@ from random_forest import randomForest
 from ada_boost import adaBoost
 from naiveBayesCategorico import naiveBayesCategorical
 
+#Calcolo delle feature importance
 def printFeatureRanking(clf, X, path):
     importances = clf.feature_importances_
     indices = np.argsort(importances)[::-1]
@@ -13,8 +14,8 @@ def printFeatureRanking(clf, X, path):
     for f in range(0, 5):
         print("%d. %s (%f)" % (f+1, X.columns[indices[f]], importances[indices[f]]))
 
+    # creazione del grafico
     plt.clf()
-    # Plotting dell'importanza delle feature
     plt.figure()
     plt.title("Feature importances")
     plt.bar(range(X.shape[1]), importances[indices], color="orange", align="center")

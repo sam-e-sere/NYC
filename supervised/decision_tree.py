@@ -1,6 +1,5 @@
-import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import cross_validate, train_test_split
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.preprocessing import OrdinalEncoder
 import numpy as np
@@ -17,6 +16,8 @@ def decisionTree(data, categorical_features, numeric_features, target):
     # Divisione del dataset in training set e test set
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
+    # dopo aver usato i tre criteri, è emerso che non vi è nessuna differenza significativa tra le prestazioni
+    # è stato utilizzato il criterio entropy
     
     #for crit in {"gini", "entropy", "log_loss"}:
         #print(f"Criterion: {crit}")
@@ -38,6 +39,7 @@ def decisionTree(data, categorical_features, numeric_features, target):
         mean_test_r.append(recall_score(y_test, y_test_pred, average='macro'))
         mean_test_f.append(f1_score(y_test, y_test_pred, average='macro'))
 
+    #creazione del grafico
     plt.clf()
     plt.title('Training and Test score')
     plt.plot(range(3, 26), mean_train_score, label="Training score")

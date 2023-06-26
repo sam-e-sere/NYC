@@ -153,19 +153,13 @@ def union_dataset():
 
     incidenti_meteo = pd.merge(incidenti, meteo, on=['Y','M','D','HH'], how='inner')
 
-    #rinomina delle colonne del dataset
     incidenti_meteo = incidenti_meteo.rename(columns={'ON STREET NAME':'STREET NAME'})
-
     merged1 = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'HH', 'MM', 'BOROUGH','STREET NAME'], how='inner')
 
-    #rinomina delle colonne del dataset
     traffico = traffico.rename(columns={'STREET NAME':'CROSS STREET NAME'})
-
     merged2 = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'HH', 'MM', 'BOROUGH', 'CROSS STREET NAME'], how='inner')
 
-    #rinomina delle colonne del dataset
     traffico = traffico.rename(columns={'CROSS STREET NAME':'OFF STREET NAME'})
-
     merged3 = pd.merge(incidenti_meteo, traffico, on=['Y','M','D', 'HH', 'MM', 'BOROUGH', 'OFF STREET NAME'], how='inner')
 
     # concatena i due DataFrame lungo l'asse delle righe

@@ -53,7 +53,7 @@ def borough_prediction():
     plt.fill_between(k_values, mean_test_scores - std_test_scores, mean_test_scores + std_test_scores, alpha=0.1)
     plt.title("Andamento dell'accuratezza al variare di k")
     plt.xlabel("k")
-    plt.xticks(np.arange(min(k_values), max(k_values)+1, 2.0))  # Imposta gli intervalli dell'asse x
+    plt.xticks(np.arange(min(k_values), max(k_values)+1, 2.0))
     plt.ylabel("Accuratezza")
     plt.legend()
     
@@ -72,6 +72,7 @@ def borough_prediction():
     y_pred = knn.predict(X_test)
 
     # Calcola l'accuratezza
+    print("\n--- K-NN ---")
     accuracy = accuracy_score(y_test, y_pred)
     print("Accuracy:", accuracy)
 

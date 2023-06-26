@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
-import numpy as np
 import matplotlib
+import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
@@ -26,7 +26,9 @@ inertias = []
 for k in range(1, 11):
     kmeans = KMeans(n_clusters=k, random_state=0,  n_init=10).fit(X)
     inertias.append(kmeans.inertia_)
-    """"
+    
+    # stampa nel numero di esempi di ogni cluster al variare di k
+    """
     print("con K = ", k)
     # Ottieni le etichette di cluster assegnate a ciascun esempio
     cluster_labels = kmeans.labels_
@@ -86,4 +88,4 @@ plt.savefig(path)
 silhouette_avg = silhouette_score(X, kmeans.labels_)
 
 # Stampa l'indice di silhouette medio
-print("Indice di silhouette medio:", silhouette_avg)
+print("\n Indice di silhouette medio:", silhouette_avg)

@@ -1,6 +1,7 @@
 import datetime
 import pandas as pd
 
+#creazione del file contenente i fatti
 def load_data_in_kb(accidents: pd.DataFrame, traffic: pd.DataFrame, weather: pd.DataFrame, kb=None):
 
     prolog_file = None
@@ -103,7 +104,7 @@ def create_prolog_kb():
 
     load_data_in_kb(accidents, traffic, weather)
 
-
+#formattazione della data
 def datetime_to_prolog_fact(datetime_str: str) -> str:
     dt = date_time_from_dataset(datetime_str)
     datetime_str = "date({},{},{},{},{},{})".format(dt.year, dt.month, dt.day,
